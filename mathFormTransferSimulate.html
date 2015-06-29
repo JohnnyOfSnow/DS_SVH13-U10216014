@@ -1,0 +1,55 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Mathematic Form Transfer Simulation</title>
+		<style>
+			canvas{
+				border: solid 1px green;
+			}
+		</style>
+	</head>
+	<body>
+		<form name = "mathForm" id="mathForm">
+			<table>
+				<tr>
+					<td><p id = "inputMathForm">這是一個可以輸入數學中序式後，可以轉成前序或後序式的模擬程式</p></td>
+				</tr>	
+			</table>
+			<hr>	
+			<table>
+				<tr>
+					<td><p id = "inputMathForm">輸入中序：</p></td>
+					<td><input type=text value="" id = inputInfix size="30" ></td>
+				</tr>	
+			</table>
+			<table>
+				<tr>
+					<td><p id = "changeTo">轉換為：</p></td>
+					<td>
+						<input type="radio" name="fix" value="前序" onClick = "fixChoice();">前序
+					</td>
+					<td>
+						<input type="radio" name="fix" value="後序" onClick = "fixChoice();">後序
+					</td>
+					<td>
+						<p id = "fixWord"></p>
+					</td>
+				</tr>	
+			</table>
+			<table>
+				<tr>
+					<td><p id = "modePrompt">操作模式：</p></td>
+					<td>
+						<input type="radio" name="mode" value="Step mode" onClick = "modeChoice();">Step mode
+					</td>
+					<td>
+						<input type="radio" name="mode" value="Run all" onClick = "modeChoice();">Run all
+					</td>
+					<td>
+						<p id = "modeWord"></p>
+					</td>
+				</tr>	
+			</table>	
+		</form>
+	</body>
+</html>
