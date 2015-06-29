@@ -49,7 +49,120 @@
 						<p id = "modeWord"></p>
 					</td>
 				</tr>	
+			</table>
+			<table>
+				<tr>
+					<td><p id = "speedPrompt">Speed：</p></td>
+					<td>
+						<input type="radio" name="speed" value="快" onClick = "speedChoice();">快
+					</td>
+					<td>
+						<input type="radio" name="speed" value="中" onClick = "speedChoice();">中
+					</td>
+					<td>
+						<input type="radio" name="speed" value="慢" onClick = "speedChoice();">慢
+					</td>
+					<td>
+						<p id = "speedWord"></p>
+					</td>
+				</tr>	
 			</table>	
 		</form>
 	</body>
+	<script>
+		// The function will be invoke, when you open the HTML file
+		window.onload = function (){
+			clearAll();
+		}
+		var mode = -1;
+		var speed = -1;
+		var fix = -1;// fix = 0 prefix,fix = 1 postfix
+		function fixChoice(){
+				var form = document.getElementById("mathForm");
+				var result = document.getElementById("fixWord");
+			
+				for (var i = 0; i < form.fix.length; i++) {
+					if ( form.fix[i].checked ) {
+						result.innerHTML = "   you selected " + form.fix[i].value;
+						fix = i;			
+						break;
+					}
+				}
+		}// end function fixChoice()
+
+		function fixClear(){
+				var form = document.getElementById("mathForm");
+				var result = document.getElementById("fixWord");
+				for (var i = 0; i < form.fix.length; i++) {
+					form.fix[i].checked = false;
+				}
+				result.innerHTML = "";
+				fix = -1;
+		}// end function fixClear()
+
+		function modeChoice(){
+				var form = document.getElementById("mathForm");
+				var result = document.getElementById("modeWord");
+			
+				for (var i = 0; i < form.mode.length; i++) {
+					if ( form.mode[i].checked ) {
+						result.innerHTML = "   you selected " + form.mode[i].value;
+						mode = i;			
+						break;
+					}
+				}
+				if(mode == 0){
+					for (var i = 0; i < form.speed.length; i++) {
+						form.speed[i].disabled = true;
+						form.speed[i].checked = false;
+					}
+					speedClear();
+				}else{
+					for (var i = 0; i < form.speed.length; i++) {
+						form.speed[i].disabled = false;
+					}
+				}
+		}// end function modeChoice()
+
+		function modeClear(){
+				var form = document.getElementById("mathForm");
+				var result = document.getElementById("modeWord");
+				for (var i = 0; i < form.mode.length; i++) {
+					form.mode[i].checked = false;
+				}
+				result.innerHTML = "";
+				mode = -1;
+
+		}// end function modeClear()
+
+		function speedChoice(){
+				var form = document.getElementById("mathForm");
+				var result = document.getElementById("speedWord");
+			
+				for (var i = 0; i < form.speed.length; i++) {
+					if ( form.speed[i].checked ) {
+						result.innerHTML = "   you selected " + form.speed[i].value;
+						speed = i;			
+						break;
+					}
+				}
+		}// end function modeChoice()
+
+		function speedClear(){
+				var form = document.getElementById("mathForm");
+				var result = document.getElementById("speedWord");
+			
+				for (var i = 0; i < form.speed.length; i++) {
+					form.speed[i].checked = false;
+				}
+				result.innerHTML = "";
+				speed = -1;
+		}// end function modeClear()
+
+		function clearAll(){
+			modeClear();
+			speedClear();
+			fixClear();
+		}
+	</script>
 </html>
