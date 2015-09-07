@@ -171,16 +171,20 @@
 					</td>
 				</tr>
 			</table>
+
 		</form>
 	</body>
 	<script>
-		// The function will be invoke, when you open the HTML file
+
+		// The function will be invoke, when you open the HTML file.
 		window.onload = function (){
 			clearAll();
 		}
-		var mode = -1;
+
+		var mode = -1;// mode = 0 step, mode = 1 all
 		var speed = -1;
 		var fix = -1;// fix = 0 prefix,fix = 1 postfix
+
 		function fixChoice(){
 				var form = document.getElementById("mathForm");
 				var result = document.getElementById("fixWord");
@@ -267,6 +271,6 @@
 			modeClear();
 			speedClear();
 			fixClear();
-		}
+		}// end function clearall()
 	</script>
 </html>
