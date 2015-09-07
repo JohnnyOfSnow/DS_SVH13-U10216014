@@ -9,64 +9,168 @@
 		</style>
 	</head>
 	<body>
-		<form name = "mathForm" id="mathForm">
-			<table>
+		<!--
+						table design reference:
+						http://www.wibibi.com/info.php?tid=441
+		-->
+		<table>
 				<tr>
 					<td><p id = "inputMathForm">這是一個可以輸入數學中序式後，可以轉成前序或後序式的模擬程式</p></td>
 				</tr>	
-			</table>
-			<hr>	
-			<table>
+		</table>
+		<hr>	
+		<form name = "mathForm" id="mathForm">
+			<table  style="border:3px #FFD382 dashed;" cellpadding="10" >
 				<tr>
-					<td><p id = "inputMathForm">輸入中序：</p></td>
-					<td><input type=text value="" id = inputInfix size="30" ></td>
-				</tr>	
+					<td>
+					
+					<table>
+						<tr>
+							<td><p id = "inputMathForm">輸入中序：</p></td>
+							<td><input type=text value="" id = inputInfix size="30" ></td>
+						</tr>	
+					</table>
+					<table>
+						<tr>
+							<td><p id = "changeTo">轉換為：</p></td>
+							<td>
+								<input type="radio" name="fix" value="前序" onClick = "fixChoice();">前序
+							</td>
+							<td>
+								<input type="radio" name="fix" value="後序" onClick = "fixChoice();">後序
+							</td>
+							<td>
+								<p id = "fixWord"></p>
+							</td>
+						</tr>	
+					</table>
+					<table>
+						<tr>
+							<td><p id = "modePrompt">操作模式：</p></td>
+							<td>
+								<input type="radio" name="mode" value="Step mode" onClick = "modeChoice();">Step mode
+							</td>
+							<td>
+								<input type="radio" name="mode" value="Run all" onClick = "modeChoice();">Run all
+							</td>
+							<td>
+								<p id = "modeWord"></p>
+							</td>
+						</tr>	
+					</table>
+					<table>
+						<tr>
+							<td><p id = "speedPrompt">Speed：</p></td>
+							<td>
+								<input type="radio" name="speed" value="快" onClick = "speedChoice();">快
+							</td>
+							<td>
+								<input type="radio" name="speed" value="中" onClick = "speedChoice();">中
+							</td>
+							<td>
+								<input type="radio" name="speed" value="慢" onClick = "speedChoice();">慢
+							</td>
+							<td>
+								<p id = "speedWord"></p>
+							</td>
+						</tr>	
+					</table>
+					<table>
+						<tr>
+							<td><p id = "speedPrompt">Step mode請按這；</p></td>
+							<td><input type = "button" style=" width:100px;height:30px;font-size:15px;border:2px green solid " value = "Next" onClick = "stepExe();" id = "stepButton" ></td>
+						</tr>
+					</table>
+
+					<table>
+						<tr>
+							<td><p id = "speedPrompt">你可以在這裡輸入你的答案：</p></td>
+							<td><input type=text value="" id=userAnswer size="30" ></td>
+						</tr>
+					</table>
+
+					<table>
+						<tr>
+							<td><p id = "speedPrompt">系統處理結果：</p></td>
+							<td><input type=text value="" id=systemAnswer size="30" readonly="readonly"></td>
+						</tr>
+					</table>
+
+					<table>
+						<tr>
+							<td><p id = "speedPrompt">Self-test比對結果：</p></td>
+							<td><p id = "userResult"></p></td>
+						</tr>
+					</table>
+
+					<!--
+						Button design reference:
+						http://csscodefile.blogspot.tw/2015/03/html-button.html
+					-->
+					<table>
+						<tr>
+							<td><input type = "button" style=" width:100px;height:30px;font-size:15px; border:2px green solid" value = "Clear all" onClick = "clearall();" id = "clearButton"></td>
+							<td><input type = "button" style="width:100px;height:30px;font-size:15px; border:2px green solid" value = "Check answer" onClick = "checkAnswer();" id = "answerButton" ></td>
+						</tr>
+					</table>
+					<td>
+					<td>
+						<table>
+							<tr>
+								<td><p id = "stackWord">Stack狀態：</p></td>
+							</tr>
+							<tr>
+								<td><input type=text style="border-top:3px black solid; border-left:3px black solid; border-bottom:3px black solid;" value="" id=stackText size="80" readonly="readonly"></td>	
+							</tr>
+						</table>
+
+						<table>
+							<tr>
+								<td><p id = "location">top</p></td>
+								
+							</tr>
+							<tr>
+								
+								<td><p id = "space1"></p></td>
+								<td><p id = "space2"></p></td>
+							</tr>
+							<tr>
+								<td><p id = "space3"></p></td>
+								<td><p id = "space4"></p></td>
+							</tr>
+						</table>
+
+						<table>
+							<tr>
+								<td><p id = "outputWord">output：</p></td>
+								
+							</tr>
+							<tr>
+								
+								<td><p id = "space5"></p></td>
+								<td><p id = "space6"></p></td>
+							</tr>
+							<tr>
+								<td><p id = "space7"></p></td>
+								<td><p id = "space8"></p></td>
+							</tr>
+							<tr>
+								<td><input type=text value="" id=outputText size="80" readonly="readonly"></td>
+							</tr>
+						</table>
+
+						<table>
+							<tr>
+								<td><p id = "allStepWord">轉換過程：</p></td>
+								
+							</tr>
+							<tr>
+								<td><textarea name="Content" style="width:570px;height:200px;" id=allStepTextArea readonly="readonly" ></textarea></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
 			</table>
-			<table>
-				<tr>
-					<td><p id = "changeTo">轉換為：</p></td>
-					<td>
-						<input type="radio" name="fix" value="前序" onClick = "fixChoice();">前序
-					</td>
-					<td>
-						<input type="radio" name="fix" value="後序" onClick = "fixChoice();">後序
-					</td>
-					<td>
-						<p id = "fixWord"></p>
-					</td>
-				</tr>	
-			</table>
-			<table>
-				<tr>
-					<td><p id = "modePrompt">操作模式：</p></td>
-					<td>
-						<input type="radio" name="mode" value="Step mode" onClick = "modeChoice();">Step mode
-					</td>
-					<td>
-						<input type="radio" name="mode" value="Run all" onClick = "modeChoice();">Run all
-					</td>
-					<td>
-						<p id = "modeWord"></p>
-					</td>
-				</tr>	
-			</table>
-			<table>
-				<tr>
-					<td><p id = "speedPrompt">Speed：</p></td>
-					<td>
-						<input type="radio" name="speed" value="快" onClick = "speedChoice();">快
-					</td>
-					<td>
-						<input type="radio" name="speed" value="中" onClick = "speedChoice();">中
-					</td>
-					<td>
-						<input type="radio" name="speed" value="慢" onClick = "speedChoice();">慢
-					</td>
-					<td>
-						<p id = "speedWord"></p>
-					</td>
-				</tr>	
-			</table>	
 		</form>
 	</body>
 	<script>
