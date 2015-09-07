@@ -109,7 +109,7 @@
 					-->
 					<table>
 						<tr>
-							<td><input type = "button" style=" width:100px;height:30px;font-size:15px; border:2px green solid" value = "Clear all" onClick = "clearall();" id = "clearButton"></td>
+							<td><input type = "button" style=" width:100px;height:30px;font-size:15px; border:2px green solid" value = "Clear all" onClick = "clearAll();" id = "clearButton"></td>
 							<td><input type = "button" style="width:100px;height:30px;font-size:15px; border:2px green solid" value = "Check answer" onClick = "checkAnswer();" id = "answerButton" ></td>
 						</tr>
 					</table>
@@ -171,28 +171,27 @@
 					</td>
 				</tr>
 			</table>
-
 		</form>
 	</body>
 	<script>
-
-		// The function will be invoke, when you open the HTML file.
+		// The function will be invoke, when you open the HTML file
 		window.onload = function (){
 			clearAll();
 		}
-
-		var mode = -1;// mode = 0 step, mode = 1 all
+		var mode = -1;
 		var speed = -1;
 		var fix = -1;// fix = 0 prefix,fix = 1 postfix
-
 		function fixChoice(){
 				var form = document.getElementById("mathForm");
 				var result = document.getElementById("fixWord");
 			
 				for (var i = 0; i < form.fix.length; i++) {
 					if ( form.fix[i].checked ) {
-						result.innerHTML = "   you selected " + form.fix[i].value;
-						fix = i;			
+						result.innerHTML = "<strong>"+"選擇 " + form.fix[i].value + "</strong>";
+						fix = i;
+						for (var i = 0; i < form.mode.length; i++) {
+							form.mode[i].disabled = false;
+						}			
 						break;
 					}
 				}
@@ -204,7 +203,14 @@
 				for (var i = 0; i < form.fix.length; i++) {
 					form.fix[i].checked = false;
 				}
+
 				result.innerHTML = "";
+
+				for (var i = 0; i < form.mode.length; i++) {
+					form.mode[i].disabled = true;
+				}	
+
+				
 				fix = -1;
 		}// end function fixClear()
 
@@ -214,7 +220,7 @@
 			
 				for (var i = 0; i < form.mode.length; i++) {
 					if ( form.mode[i].checked ) {
-						result.innerHTML = "   you selected " + form.mode[i].value;
+						result.innerHTML = "<strong>" + "選擇 " + form.mode[i].value + "</strong>";
 						mode = i;			
 						break;
 					}
@@ -237,6 +243,7 @@
 				var result = document.getElementById("modeWord");
 				for (var i = 0; i < form.mode.length; i++) {
 					form.mode[i].checked = false;
+
 				}
 				result.innerHTML = "";
 				mode = -1;
@@ -249,7 +256,7 @@
 			
 				for (var i = 0; i < form.speed.length; i++) {
 					if ( form.speed[i].checked ) {
-						result.innerHTML = "   you selected " + form.speed[i].value;
+						result.innerHTML = "<strong>" + "選擇 " + form.speed[i].value + "速</strong>";
 						speed = i;			
 						break;
 					}
@@ -262,6 +269,7 @@
 			
 				for (var i = 0; i < form.speed.length; i++) {
 					form.speed[i].checked = false;
+					form.speed[i].disabled = true;
 				}
 				result.innerHTML = "";
 				speed = -1;
@@ -271,6 +279,6 @@
 			modeClear();
 			speedClear();
 			fixClear();
-		}// end function clearall()
+		}
 	</script>
 </html>
