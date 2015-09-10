@@ -161,6 +161,16 @@
 
 						<table>
 							<tr>
+								<td><p id = "allStepWord">目前過程：</p></td>
+								
+							</tr>
+							<tr>
+								<td><textarea name="Content" style="width:570px;height:100px;" id=currentStepTextArea readonly="readonly" ></textarea></td>
+							</tr>
+						</table>
+
+						<table>
+							<tr>
 								<td><p id = "allStepWord">轉換過程：</p></td>
 								
 							</tr>
@@ -178,9 +188,13 @@
 		window.onload = function (){
 			clearAll();
 		}
+
 		var mode = -1;
 		var speed = -1;
 		var fix = -1;// fix = 0 prefix,fix = 1 postfix
+		var fixString = "";
+		var stackStringStore = "";
+
 		function fixChoice(){
 				var form = document.getElementById("mathForm");
 				var result = document.getElementById("fixWord");
@@ -275,10 +289,99 @@
 				speed = -1;
 		}// end function modeClear()
 
+		function fixPreHandle(){
+			var fixString = document.getElementById("inputInfix");
+			var temp;// is a character array
+			var str = ""; // temporarily store digit.
+			var first = 1;
+			var digitIsNeedToFind = 0;
+			if(mode != -1){ // choose mode
+				if(fix != -1){ // choose fix
+					temp = (fixString.value).split(""); // sperate the string user input
+					
+					for(var count = 0; count < temp.length; count++){
+						
+						switch(temp[count]){
+							case "0":
+							case "1":
+							case "2":
+							case "3":
+							case "4":
+							case "5":
+							case "6":
+							case "7":
+							case "8":
+							case "9":
+								str = str + temp[count];
+								digitIsNeedToFind = 1;// Maybe the number is tens, hundreds, etc.
+							break;
+							case "+":
+							case "-":
+							case "*":
+							case "/":
+							case "(":
+							case ")":
+								if(digitIsNeedToFind == 1){
+									if(first == 1){
+										fixString = str;
+										first = 0;
+										str = "";
+										digitIsNeedToFind = 0;
+										count = count - 1;
+									}else{
+										fixString = fixString + " " + str;
+										count = count - 1;
+										digitIsNeedToFind = 0;
+										str = "";
+									}
+									
+								}else{
+									if(first == 1){
+										fixString = temp[count];
+										first = 0;
+									}else{
+										fixString = fixString + " " + temp[count];
+									}
+								}
+							break;
+							default:
+								if(digitIsNeedToFind == 1){
+									if(first == 1){
+										fixString = temp[count];
+										first = 0;
+									}else{
+										fixString = fixString + " " + str;
+										digitIsNeedToFind = 0;
+										str = "";
+									}	
+								}
+						}// end switch
+					}// end for loop
+
+					if(str != ""){ // reserve character need to check
+						fixString = fixString + " " + str;
+					}
+					document.getElementById("currentStepTextArea").innerHTML = fixString;
+				}// end if
+			}// end if
+		}// end function fixPreHandle()
+
+		function stepExe(){
+			fixPreHandle();
+		}// end function stepExe()
+
+		function dataDelete(){
+			document.getElementById("inputInfix").value = ""; // text field clear data should use the value attribute.
+			//document.getElementById("inputInfix").innerHTML = "";
+			fixString = "";
+			stackStringStore = "";
+		}
+
 		function clearAll(){
 			modeClear();
 			speedClear();
 			fixClear();
+			dataDelete();
 		}
 	</script>
 </html>
