@@ -193,7 +193,18 @@
 		var speed = -1;
 		var fix = -1;// fix = 0 prefix,fix = 1 postfix
 		var fixString = "";
+		var infixArray;
 		var stackStringStore = "";
+		var outputStringStore = "";
+		var infixArrayIndex = 0;
+		var popContinue = 0;
+		var first = 1;
+		var allStepWordString = "";
+		var step = 0;
+		var currentStr = "";
+		var operator = "";
+		var firstFind = 1;
+		var isAlreadyDecide = 0;
 
 		function fixChoice(){
 				var form = document.getElementById("mathForm");
@@ -361,20 +372,361 @@
 					if(str != ""){ // reserve character need to check
 						fixString = fixString + " " + str;
 					}
-					document.getElementById("currentStepTextArea").innerHTML = fixString;
+					infixArray = fixString.split(" "); 
+					//document.getElementById("currentStepTextArea").innerHTML = fixString;
 				}// end if
 			}// end if
 		}// end function fixPreHandle()
 
+		function doPostfix(){
+			
+			if(infixArray[infixArrayIndex] == ")"){
+				currentStr = currentStr + "\n--->遇到 ) 開始pop堆疊直到遇見 ( ";
+				popContinue = 1;
+			}
+			if(popContinue == 1){
+				doStackPop();
+			}else{
+				if(!isNaN(infixArray[infixArrayIndex])){
+					if(first == 1){
+						currentStr = currentStr + "\n--->輸出 " + infixArray[infixArrayIndex] + "到後端";
+						outputStringStore = infixArray[infixArrayIndex];
+						first = 0;
+						infixArrayIndex++;
+					}else{
+						currentStr = currentStr + "\n--->輸出 " + infixArray[infixArrayIndex] + "到後端";
+						outputStringStore = outputStringStore + " " + infixArray[infixArrayIndex];
+						infixArrayIndex++;
+					}
+				}else{
+					if(doStackPeek() == "empty"){
+						currentStr = currentStr + "\n--->堆疊為空 " + infixArray[infixArrayIndex] + " 壓入堆疊";
+						doStackPush(infixArray[infixArrayIndex]);
+						infixArrayIndex++;
+					}else{
+						if(getScanPeriority(infixArray[infixArrayIndex]) > getStackUpperPeriority(doStackPeek())){
+							currentStr = currentStr + "\n--->因為 " + infixArray[infixArrayIndex] + " 的優先權比 " + doStackPeek() + "還高，直接壓入堆疊";
+							doStackPush(infixArray[infixArrayIndex]);
+							infixArrayIndex++;
+						}else if(getScanPeriority(infixArray[infixArrayIndex]) == getStackUpperPeriority(doStackPeek())){
+							currentStr = currentStr + "\n--->因為 " + infixArray[infixArrayIndex] + " 的優先權和 " + doStackPeek() + " 一樣";
+							currentStr = currentStr + "\n--->要壓入 " + infixArray[infixArrayIndex] + "需先pop出 " + doStackPeek();
+							doStackPop();
+							currentStr = currentStr + "\n--->但是你得繼續和堆疊的上層運算子繼續比較";
+							
+							step = 4;
+							firstFind = 1;
+							decideWhatTimeCanPushInStack();
+							//operator = infixArray[infixArrayIndex];
+							/**
+							////////////////////////////////////////////////////////////////////
+							while(getScanPeriority(infixArray[infixArrayIndex]) <= getStackUpperPeriority(doStackPeek())){
+								if(doStackPeek() == "empty"){
+									break;
+								}else{
+									currentStr = currentStr + "\n因為 " + infixArray[infixArrayIndex] + " 的優先權比 " + doStackPeek() + "一樣";
+									currentStr = currentStr + "\n要壓入 " + infixArray[infixArrayIndex] + "需先pop出 " + doStackPeek();
+									doStackPop();
+								}	
+							}
+
+							////////////////////////////////////////////////////////////////////
+							if(doStackPeek() != "empty"){
+								if(getScanPeriority(infixArray[infixArrayIndex]) > getStackUpperPeriority(doStackPeek())){
+									currentStr = currentStr + "\n可以壓入 " + infixArray[infixArrayIndex];
+									doStackPush(infixArray[infixArrayIndex]);
+									infixArrayIndex++;
+								}else{
+
+									outputStringStore = outputStringStore + " " + infixArray[infixArrayIndex];
+									infixArrayIndex++;
+								}
+							}else{
+								doStackPop();
+								if(doStackPeek() != "empty"){
+									while(getScanPeriority(infixArray[infixArrayIndex]) <=getStackUpperPeriority(doStackPeek())){
+										if(doStackPeek() == "empty"){
+											break;
+										}else{
+											if(getScanPeriority(infixArray[infixArrayIndex]) <getStackUpperPeriority(doStackPeek())){
+											currentStr = currentStr + "\n  " + infixArray[infixArrayIndex] + " 的優先權比 " + doStackPeek() + " 小";
+											}else{
+											currentStr = currentStr + "\n  " + infixArray[infixArrayIndex] + " 的優先權和 " + doStackPeek() + " 一樣";
+											}
+											doStackPop();
+										}	
+									}
+									doStackPush(infixArray[infixArrayIndex]);
+									infixArrayIndex++;
+								}else{
+									doStackPush(infixArray[infixArrayIndex]);
+									infixArrayIndex++;
+								}
+							}*/
+						}else{
+							currentStr = currentStr + "\n--->因為 " + infixArray[infixArrayIndex] + " 的優先權比 " + doStackPeek() + " 小";
+							currentStr = currentStr + "\n--->要壓入 " + infixArray[infixArrayIndex] + "需先pop出 " + doStackPeek();
+							doStackPop();
+							currentStr = currentStr + "\n--->但是你得繼續和堆疊的上層運算子繼續比較";
+							step = 4;
+							firstFind = 1;
+							decideWhatTimeCanPushInStack();
+							/**
+							if(doStackPeek() != "empty"){
+								////////////////////////////////////////////////////////////////////
+								while(getScanPeriority(infixArray[infixArrayIndex]) <=getStackUpperPeriority(doStackPeek())){
+									if(doStackPeek() == "empty"){
+										break;
+									}else{
+										if(getScanPeriority(infixArray[infixArrayIndex]) <getStackUpperPeriority(doStackPeek())){
+											currentStr = currentStr + "\n" + infixArray[infixArrayIndex] + " 的優先權比 " + doStackPeek() + " 小";
+										}else{
+											currentStr = currentStr + "\n" + infixArray[infixArrayIndex] + " 的優先權和 " + doStackPeek() + " 一樣";
+										}
+										doStackPop();
+									}	
+								}
+								////////////////////////////////////////////////////////////////////
+								doStackPush(infixArray[infixArrayIndex]);
+								infixArrayIndex++;
+							}else{
+								doStackPush(infixArray[infixArrayIndex]);
+								infixArrayIndex++;
+							}
+							*/
+							/**
+							outputStringStore = outputStringStore + " " + infixArray[infixArrayIndex];
+								infixArrayIndex++;*/
+						}
+					}
+				}
+			}
+			document.getElementById("currentStepTextArea").innerHTML = currentStr;
+			allStepWordString = allStepWordString + "\n" + currentStr;
+		}
+
+		function decideWhatTimeCanPushInStack(){
+			if(firstFind == 0){
+				if(doStackPeek() != "empty"){
+								
+					if(getScanPeriority(infixArray[infixArrayIndex]) > getStackUpperPeriority(doStackPeek())){
+						currentStr = currentStr + "\n最後 " + infixArray[infixArrayIndex] + " 的優先權比 " + doStackPeek() + "還高，可以壓入堆疊";
+						doStackPush(infixArray[infixArrayIndex]);
+						infixArrayIndex++;
+						step = 1;
+						firstFind = 1;
+						isAlreadyDecide = 1;
+					}else if(getScanPeriority(infixArray[infixArrayIndex]) == getStackUpperPeriority(doStackPeek())){
+						currentStr = currentStr + "\n--->因為 " + infixArray[infixArrayIndex] + " 的優先權和 " + doStackPeek() + "一樣";
+						doStackPop();
+						currentStr = currentStr + "\n還要繼續與堆疊頂端的運算子比較";
+
+					}else if(getScanPeriority(infixArray[infixArrayIndex]) < getStackUpperPeriority(doStackPeek())){
+						currentStr = currentStr + "\n--->因為 " + infixArray[infixArrayIndex] + " 的優先權比 " + doStackPeek() + "小";
+						doStackPop();
+						currentStr = currentStr + "\n還要繼續與堆疊頂端的運算子比較";
+					}else{
+
+					}
+				}else{
+					currentStr = currentStr + "\n現在堆疊為空 " + infixArray[infixArrayIndex] + " 直接壓入堆疊";
+					doStackPush(infixArray[infixArrayIndex]);
+						infixArrayIndex++;
+						step = 1;
+						firstFind = 1;
+						isAlreadyDecide = 1;
+				}
+			}else{
+				firstFind = 0;
+			}
+		}
+
+		function getScanPeriority(op1){
+			switch(op1){
+				case "+":
+				case "-":
+					return 1;
+				break;
+				case "*":
+				case "/":
+					return 2;
+				break;
+				case "(":
+					return 3;
+				break;
+				default:
+			}
+		}
+
+		function getStackUpperPeriority(op2){
+			switch(op2){
+				case "+":
+				case "-":
+					return 1;
+				break;
+				case "*":
+				case "/":
+					return 2;
+				break;
+				case "(":
+					return 0;
+				break;
+				default:
+			}
+		}
+
+		function doStackPeek(){
+			if(stackStringStore == ""){
+				return "empty"
+			}else{
+				var temp = stackStringStore.split(" "); 
+				return temp[temp.length - 1];
+			}
+		}
+
+
+		function doStackPop(){
+			if(stackStringStore == ""){
+
+			}else{
+				var temp = stackStringStore.split(" "); 
+				var newStackString = "";
+				var button = 1;
+				for(var count = 0; count < temp.length - 1; count++){
+					if(button == 1){
+						newStackString = temp[count];
+						button = 0;
+					}else{
+						newStackString = newStackString + " " + temp[count];
+					}
+				}
+				if(temp[count] == "("){
+					popContinue = 0;
+					infixArrayIndex++;
+				}else{
+					outputStringStore = outputStringStore + " " + temp[count];
+				}
+				currentStr = currentStr + "\nPop " + temp[count];
+				stackStringStore = newStackString;
+			}
+		}
+
+		function doStackPush(op){
+			if(stackStringStore == ""){
+				stackStringStore = op;
+			}else{
+				stackStringStore = stackStringStore + " " + op;
+			}
+		}
+
+
 		function stepExe(){
-			fixPreHandle();
+			
+			//var word = document.getElementById("allStepWordString");
+			if(step == 0){
+				currentStr = "";
+				currentStr = "開始進行中序轉後序，掃描方向為由左到右\n";
+				document.getElementById("outputText").value = outputStringStore;
+				document.getElementById("stackText").value = stackStringStore;
+				allStepWordString = currentStr;
+				document.getElementById("currentStepTextArea").innerHTML = currentStr;
+				document.getElementById("allStepTextArea").innerHTML = allStepWordString;
+				fixPreHandle();
+				step++;
+			}else if(step == 1){
+				if(infixArrayIndex < infixArray.length){
+					currentStr = "";
+					currentStr = "\nScan: " + infixArray[infixArrayIndex];
+					doPostfix();
+					document.getElementById("outputText").value = outputStringStore;
+					document.getElementById("stackText").value = stackStringStore;
+					document.getElementById("allStepTextArea").innerHTML = allStepWordString;
+					if(firstFind == 0){
+						step = 4;
+					}else{
+						step = 1;
+					}
+					
+				}else{
+					if(doStackPeek() == "empty"){
+						step = 3;
+					}else{
+						currentStr = "";
+						currentStr = "\nScan完畢，但堆疊還有運算子";
+						doStackPop();
+						document.getElementById("currentStepTextArea").innerHTML = currentStr;
+						document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value;
+						allStepWordString = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value; 
+						document.getElementById("outputText").value = outputStringStore;
+						document.getElementById("stackText").value = stackStringStore;
+						step = 2;
+					}
+					
+				}
+			}else if(step == 2){
+				if(doStackPeek() == "empty"){
+					currentStr = "";
+					currentStr = "\n中序式轉後序式結束";
+					document.getElementById("currentStepTextArea").innerHTML = currentStr;
+					document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + currentStr;
+					step = 3;
+				}else{
+					currentStr = "";
+					currentStr = "\nScan完畢，但堆疊還有運算子";
+					doStackPop();
+					document.getElementById("currentStepTextArea").innerHTML = currentStr;
+					document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value;
+					allStepWordString = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value; 
+					document.getElementById("outputText").value = outputStringStore;
+					document.getElementById("stackText").value = stackStringStore;
+					step = 2;
+				}
+
+			}else if(step == 4){
+				var oldCurrent = currentStr;
+				decideWhatTimeCanPushInStack();
+				document.getElementById("outputText").value = outputStringStore;
+				document.getElementById("stackText").value = stackStringStore;
+				var temp = allStepWordString;
+				document.getElementById("currentStepTextArea").innerHTML = oldCurrent + "\n" + currentStr;
+				document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" +currentStr;
+				if(isAlreadyDecide == 0){
+					allStepWordString = temp;
+				}else{
+					isAlreadyDecide = 0;
+					allStepWordString = allStepWordString + currentStr;
+					step = 1;
+				}
+				
+			}else if(step == 3){
+				currentStr = "";
+				currentStr = "\n中序式轉後序式結束";
+				document.getElementById("currentStepTextArea").innerHTML = currentStr;
+				document.getElementById("allStepTextArea").innerHTML = allStepWordString + currentStr;
+				step = 5;
+			}else{
+
+			}
 		}// end function stepExe()
 
 		function dataDelete(){
 			document.getElementById("inputInfix").value = ""; // text field clear data should use the value attribute.
+			document.getElementById("outputText").value = "";
+			document.getElementById("stackText").value = "";;
+			document.getElementById("allStepTextArea").innerHTML = "";
+			document.getElementById("currentStepTextArea").innerHTML = "";
 			//document.getElementById("inputInfix").innerHTML = "";
 			fixString = "";
 			stackStringStore = "";
+			outputStringStore = "";
+			infixArrayIndex = 0;
+			popContinue = 0;
+			first = 1;
+			allStepWordString = "";
+			step = 0;
+			currentStr = "";
+			firstFind = 1;
+			isAlreadyDecide = 0;
 		}
 
 		function clearAll(){
@@ -383,5 +735,7 @@
 			fixClear();
 			dataDelete();
 		}
+
+		//1+(2*3/4-5-6)*7-8*9
 	</script>
 </html>
