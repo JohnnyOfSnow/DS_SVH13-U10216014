@@ -205,6 +205,8 @@
 		var operator = "";
 		var firstFind = 1;
 		var isAlreadyDecide = 0;
+		var oldCurrent = "";
+		var oldAllStep = "";
 
 		function fixChoice(){
 				var form = document.getElementById("mathForm");
@@ -702,20 +704,26 @@
 					}
 
 				}else if(step == 4){
-					var oldCurrent = currentStr;
+					oldCurrent = oldCurrent + currentStr;
+					oldAllStep = allStepWordString;
 					currentStr = "";
 					decideWhatTimeCanPushInStack();
 					document.getElementById("outputText").value = outputStringStore;
 					document.getElementById("stackText").value = stackStringStore;
 					var temp = allStepWordString;
 					document.getElementById("currentStepTextArea").innerHTML = oldCurrent + "\n" + currentStr;
-					document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" +currentStr;
+					document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + currentStr;
+
 					if(isAlreadyDecide == 0){
-						allStepWordString = temp;
+						allStepWordString = allStepWordString + currentStr;
 					}else{
 						isAlreadyDecide = 0;
-						allStepWordString = allStepWordString + currentStr;
+						oldCurrent = oldCurrent + currentStr;
+						allStepWordString = document.getElementById("allStepTextArea").value;
 						step = 1;
+						oldCurrent = "";
+						oldAllStep = "";
+						currentStr = "";
 					}
 					
 				}else if(step == 3){
@@ -748,6 +756,8 @@
 			currentStr = "";
 			firstFind = 1;
 			isAlreadyDecide = 0;
+			oldCurrent = "";
+			oldAllStep = "";
 		}
 
 		function clearAll(){
