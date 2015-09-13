@@ -86,27 +86,28 @@
 					<table>
 						<tr>
 							<td><p id = "runAllPrompt">Run all mode請按這；</p></td>
-							<td><input type = "button" style=" width:100px;height:30px;font-size:15px;border:2px green solid " value = "Run all" onClick = "stepExe();" id = "runAllButton" disabled="true"></td>
+							<td><input type = "button" style=" width:100px;height:30px;font-size:15px;border:2px green solid " value = "Run all" onClick = "runAllExe();" id = "runAllButton" disabled="true"></td>
+							<td><p id = "speedDisplay"></p></td>
 						</tr>
 					</table>
 
 					<table>
 						<tr>
-							<td><p id = "speedPrompt">你可以在這裡輸入你的答案：</p></td>
+							<td><p id = "userInputAnswer">你可以在這裡輸入你的答案：</p></td>
 							<td><input type=text value="" id=userAnswer size="30" ></td>
 						</tr>
 					</table>
 
 					<table>
 						<tr>
-							<td><p id = "speedPrompt">系統處理結果：</p></td>
+							<td><p id = "ststemPrompt">系統處理結果：</p></td>
 							<td><input type=text value="" id=systemAnswer size="30" readonly="readonly"></td>
 						</tr>
 					</table>
 
 					<table>
 						<tr>
-							<td><p id = "speedPrompt">Self-test比對結果：</p></td>
+							<td><p id = "selfTestResult">Self-test比對結果：</p></td>
 							<td><p id = "userResult"></p></td>
 						</tr>
 					</table>
@@ -118,7 +119,7 @@
 					<table>
 						<tr>
 							<td><input type = "button" style=" width:100px;height:30px;font-size:15px; border:2px green solid" value = "Clear all" onClick = "clearAll();" id = "clearButton"></td>
-							<td><input type = "button" style="width:100px;height:30px;font-size:15px; border:2px green solid" value = "Check answer" onClick = "checkAnswer();" id = "answerButton" ></td>
+							<td><input type = "button" style="width:100px;height:30px;font-size:15px; border:2px green solid" value = "Check answer" onClick = "checkAnswer();" id = "answerButton" disabled="true"></td>
 						</tr>
 					</table>
 					<td>
@@ -134,7 +135,7 @@
 
 						<table>
 							<tr>
-								<td><p id = "location">top</p></td>
+								<td><p id = "location">↑top</p></td>
 								
 							</tr>
 							<tr>
@@ -194,6 +195,7 @@
 	<script>
 		// The function will be invoke, when you open the HTML file
 		window.onload = function (){
+			clearInterval(myTimer);
 			clearAll();
 		}
 
@@ -215,8 +217,13 @@
 		var isAlreadyDecide = 0;
 		var oldCurrent = "";
 		var oldAllStep = "";
+		var myTimer;
+		var lowSpeed = 3000;
+		var medSpeed = 2000;
+		var highSpeed = 1000;
 
 		function fixChoice(){
+			clearInterval(myTimer);
 			dataDelete();
 			var form = document.getElementById("mathForm");
 			var result = document.getElementById("fixWord");
@@ -235,6 +242,7 @@
 		}// end function fixChoice()
 
 		function fixClear(){
+			clearInterval(myTimer);
 			var form = document.getElementById("mathForm");
 			var result = document.getElementById("fixWord");
 			for (var i = 0; i < form.fix.length; i++) {
@@ -253,6 +261,7 @@
 		}// end function fixClear()
 
 		function modeChoice(){
+			clearInterval(myTimer);
 			dataDelete();
 			var form = document.getElementById("mathForm");
 			var result = document.getElementById("modeWord");
@@ -281,6 +290,7 @@
 		}// end function modeChoice()
 
 		function modeClear(){
+			clearInterval(myTimer);
 			var form = document.getElementById("mathForm");
 			var result = document.getElementById("modeWord");
 			for (var i = 0; i < form.mode.length; i++) {
@@ -293,6 +303,7 @@
 		}// end function modeClear()
 
 		function speedChoice(){
+			clearInterval(myTimer);
 			var form = document.getElementById("mathForm");
 			var result = document.getElementById("speedWord");
 		
@@ -307,6 +318,7 @@
 		}// end function modeChoice()
 
 		function speedClear(){
+			clearInterval(myTimer);
 			var form = document.getElementById("mathForm");
 			var result = document.getElementById("speedWord");
 		
@@ -325,7 +337,7 @@
 			var str = ""; // temporarily store digit.
 			var first = 1;
 			var digitIsNeedToFind = 0;
-			if(mode != -1){ // choose mode
+			//if(mode != -1){ // choose mode
 				if(fix != -1){ // choose fix
 					if(fixString.value != ""){
 						temp = (fixString.value).split(""); // sperate the string user input
@@ -402,7 +414,7 @@
 
 					}
 				}// end if
-			}// end if
+			//}// end if
 		}// end function fixPreHandle()
 
 		function doPostfix(){
@@ -678,6 +690,18 @@
 				}
 				
 				stackStringStore = newStackString;
+				var temp = stackStringStore.split(" ");
+				if(temp.length == 1){
+					document.getElementById("location").innerHTML = "<strong>↑top</strong>";
+				}else{
+					var string = "<strong>↑top</strong>";
+					var count = 0;
+					while(count < (temp.length-1)){
+						string = "--" + string;
+						count++;
+					}
+					document.getElementById("location").innerHTML = string;
+				}
 			}
 		}
 
@@ -687,11 +711,24 @@
 			}else{
 				stackStringStore = stackStringStore + " " + op;
 			}
+			var temp = stackStringStore.split(" ");
+			if(temp.length == 1){
+				document.getElementById("location").innerHTML = "<strong>↑top</strong>";
+			}else{
+				var string = "<strong>↑top</strong>";
+				var count = 0;
+				while(count < (temp.length - 1)){
+					string = "--" + string;
+					count++;
+				}
+				document.getElementById("location").innerHTML = string;
+			}
+
 		}
 
 
 		function stepExe(){
-			if(mode != -1 && fix == 1){
+			if(fix == 1){
 				//var word = document.getElementById("allStepWordString");
 				if(step == 0){
 					currentStr = "";
@@ -744,7 +781,7 @@
 						currentStr = "\n中序式轉後序式結束";
 						document.getElementById("currentStepTextArea").innerHTML = currentStr;
 						document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + currentStr;
-						step = 3;
+						step = 5;
 					}else{
 						currentStr = "";
 						currentStr = "\nScan完畢，但堆疊還有運算子";
@@ -789,7 +826,7 @@
 				}else{
 
 				}
-			}else if(mode != -1 && fix == 0){
+			}else if(fix == 0){
 				if(step == 0){
 					currentStr = "";
 					currentStr = "開始進行中序轉前序，掃描方向為由右到左\n";
@@ -842,7 +879,7 @@
 						currentStr = "\n中序式轉前序式結束";
 						document.getElementById("currentStepTextArea").innerHTML = currentStr;
 						document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + currentStr;
-						step = 3;
+						step = 5;
 					}else{
 						currentStr = "";
 						currentStr = "\nScan完畢，但堆疊還有運算子";
@@ -885,12 +922,32 @@
 					document.getElementById("allStepTextArea").innerHTML = allStepWordString + currentStr;
 					step = 5;
 				}else{
-
+					// step 5
+					// End will enter this block.
 				}
 			}else{
 
 			}
 		}// end function stepExe()
+
+		function runAllExe(){
+				if(speed == 0){
+					document.getElementById("speedDisplay").innerHTML = "每步停留為" + (highSpeed/1000) + "秒";
+					myTimer = setInterval("stepExe()",highSpeed);
+				}else if(speed == 1){
+					document.getElementById("speedDisplay").innerHTML = "每步停留為" + (medSpeed/1000) + "秒";
+					myTimer = setInterval("stepExe()",medSpeed);
+				}else if(speed == 2){
+					document.getElementById("speedDisplay").innerHTML = "每步停留為" + (lowSpeed/1000) + "秒";
+					myTimer = setInterval("stepExe()",lowSpeed);
+				}else{
+					document.getElementById("speedDisplay").innerHTML = "你沒有選速度";
+				}
+				/*
+				while(huffmanStep != 4 && ifInputFrequency != 0){
+					stepExecute();
+				}*/
+			}
 
 		function dataDelete(){
 			
@@ -898,8 +955,16 @@
 			document.getElementById("stackText").value = "";;
 			document.getElementById("allStepTextArea").innerHTML = "";
 			document.getElementById("currentStepTextArea").innerHTML = "";
+			document.getElementById("location").innerHTML = "<strong>↑top</strong>";
 			//document.getElementById("inputInfix").innerHTML = "";
-			
+			document.getElementById("inputMathFormPrompt").style.backgroundColor = "#fff";
+			document.getElementById("changeTo").style.backgroundColor = "#fff";
+			document.getElementById("modePrompt").style.backgroundColor = "#fff";
+			document.getElementById("speedPrompt").style.backgroundColor = "#fff";
+			document.getElementById("stepModePrompt").style.backgroundColor = "#fff";
+			document.getElementById("runAllPrompt").style.backgroundColor = "#fff";
+			document.getElementById("selfTestResult").style.backgroundColor = "#fff";
+			document.getElementById("userInputAnswer").style.backgroundColor = "#fff";
 			fixString = "";
 			stackStringStore = "";
 			outputStringStore = "";
@@ -918,6 +983,9 @@
 
 		function clearAll(){
 			document.getElementById("inputInfix").value = ""; // text field clear data should use the value attribute.
+			document.getElementById("systemAnswer").value = "";
+			document.getElementById("userAnswer").value = "";
+			document.getElementById("userResult").innerHTML = "";
 			mode = -1;
 			speed = -1;
 			fix = -1;// fix = 0 prefix,fix = 1 postfix
@@ -925,12 +993,15 @@
 			speedClear();
 			fixClear();
 			dataDelete();
+			/**
 			document.getElementById("inputMathFormPrompt").style.backgroundColor = "#fff";
 			document.getElementById("changeTo").style.backgroundColor = "#fff";
 			document.getElementById("modePrompt").style.backgroundColor = "#fff";
 			document.getElementById("speedPrompt").style.backgroundColor = "#fff";
 			document.getElementById("stepModePrompt").style.backgroundColor = "#fff";
 			document.getElementById("runAllPrompt").style.backgroundColor = "#fff";
+			document.getElementById("selfTestResult").style.backgroundColor = "#fff";
+			document.getElementById("speedDisplay").innerHTML = "";*/
 			process();
 
 		}
@@ -948,30 +1019,75 @@
 				document.getElementById("runAllButton").disabled = true;	
 				document.getElementById("inputMathFormPrompt").style.backgroundColor = "#ff6";
 				document.getElementById("changeTo").style.backgroundColor = "#ff6";
+				document.getElementById("answerButton").disabled = true;
 			}else{
+				document.getElementById("answerButton").disabled = true;
+				document.getElementById("systemAnswer").value = "";
+				document.getElementById("userAnswer").value = "";
+				document.getElementById("userResult").innerHTML = "";
 				if(mode == -1){
-					document.getElementById("inputMathForm").innerHTML = "<strong>再來選擇Step mode或是Run all mode</strong>";
+					document.getElementById("inputMathForm").innerHTML = "<strong>再來選擇Step mode或是Run all mode，或者你可以自我測驗於(你可以在這裡輸入你的答案)那邊輸入你覺得轉換後的式子，再按下CheckAnswer鈕</strong>";
 					document.getElementById("stepButton").disabled = true;
 					document.getElementById("runAllButton").disabled = true;
 					document.getElementById("modePrompt").style.backgroundColor = "#ff6";
+					document.getElementById("userInputAnswer").style.backgroundColor = "#ff6";
+					document.getElementById("answerButton").disabled = false;
 				}else if(mode == 1){
 					if(speed == -1){
-						document.getElementById("inputMathForm").innerHTML = "<strong>你選擇Run all，請你選擇速度</strong>";
+						document.getElementById("inputMathForm").innerHTML = "<strong>你選擇Run all，請你選擇速度，或者你可以自我測驗於(你可以在這裡輸入你的答案)那邊輸入你覺得轉換後的式子，再按下CheckAnswer鈕</strong>";
 						// you can choose a run all
-						document.getElementById("stepButton").disabled = false;
-						document.getElementById("runAllButton").disabled = true;
-						document.getElementById("speedPrompt").style.backgroundColor = "#ff6";
-					}else{
-						document.getElementById("inputMathForm").innerHTML = "<strong>你選擇Run all，而且你選了速度，現在你可以按下Run all按鈕</strong>";
+						document.getElementById("answerButton").disabled = false;
 						document.getElementById("stepButton").disabled = true;
 						document.getElementById("runAllButton").disabled = false;
+						document.getElementById("speedPrompt").style.backgroundColor = "#ff6";
+						document.getElementById("userInputAnswer").style.backgroundColor = "#ff6";
+					}else{
+						document.getElementById("inputMathForm").innerHTML = "<strong>你選擇Run all，而且你選了速度，現在你可以按下Run all按鈕，或者你可以自我測驗於(你可以在這裡輸入你的答案)那邊輸入你覺得轉換後的式子，再按下CheckAnswer鈕</strong>";
+						document.getElementById("stepButton").disabled = true;
+						document.getElementById("runAllButton").disabled = false;
+						document.getElementById("answerButton").disabled = false;
 						document.getElementById("runAllPrompt").style.backgroundColor = "#ff6";
+						document.getElementById("userInputAnswer").style.backgroundColor = "#ff6";
 					}
 				}else if(mode == 0){
-					document.getElementById("inputMathForm").innerHTML = "<strong>你選擇Step mode，現在你可以按下Next按鈕，觀看轉換的每一步驟</strong>";
+					document.getElementById("inputMathForm").innerHTML = "<strong>你選擇Step mode，現在你可以按下Next按鈕，觀看轉換的每一步驟，或者你可以自我測驗於(你可以在這裡輸入你的答案)那邊輸入你覺得轉換後的式子，再按下CheckAnswer鈕</strong>";
 					document.getElementById("stepModePrompt").style.backgroundColor = "#ff6";
+					document.getElementById("userInputAnswer").style.backgroundColor = "#ff6";
+					document.getElementById("answerButton").disabled = false;
+					document.getElementById("runAllButton").disabled = true;
 				}
 			}
+		}
+
+		function checkAnswer(){
+			clearInterval(myTimer);
+			modeClear();
+			speedClear();
+			document.getElementById("inputMathFormPrompt").style.backgroundColor = "#fff";
+			document.getElementById("changeTo").style.backgroundColor = "#fff";
+			document.getElementById("modePrompt").style.backgroundColor = "#fff";
+			document.getElementById("speedPrompt").style.backgroundColor = "#fff";
+			document.getElementById("stepModePrompt").style.backgroundColor = "#fff";
+			document.getElementById("runAllPrompt").style.backgroundColor = "#fff";
+			document.getElementById("selfTestResult").style.backgroundColor = "#ff6";
+
+
+			while(step != 5){
+				stepExe();
+			}
+
+			document.getElementById("systemAnswer").value = outputStringStore;
+
+			var userInput = document.getElementById("userAnswer").value;
+
+			if(outputStringStore == userInput){
+				document.getElementById("userResult").innerHTML = "答對";
+				document.getElementById("inputMathForm").innerHTML = "<strong>恭喜你答對，你可以在旁邊的轉換過程詳細確認，或是可以按下Clear All將程式重來一次</strong>";
+			}else{
+				document.getElementById("userResult").innerHTML = "答錯";
+				document.getElementById("inputMathForm").innerHTML = "<strong>可惜，你答錯了，你可能輸入答案時沒有各數字或運算子空一格，或是中間步驟可能出錯</strong>";
+			}
+
 		}
 
 		//1+(2*3/4-5-6)*7-8*9
