@@ -313,6 +313,7 @@
 			}
 			result.innerHTML = "";
 			speed = -1;
+			document.getElementById("speedWord").innerHTML = "";
 			process();
 		}// end function modeClear()
 
@@ -940,6 +941,7 @@
 			document.getElementById("stackText").value = "";;
 			document.getElementById("allStepTextArea").innerHTML = "";
 			document.getElementById("currentStepTextArea").innerHTML = "";
+			document.getElementById("userAnswer").value = "";
 			document.getElementById("location").innerHTML = "<strong>↑top</strong>";
 			//document.getElementById("inputInfix").innerHTML = "";
 			document.getElementById("inputMathFormPrompt").style.backgroundColor = "#fff";
@@ -1008,7 +1010,7 @@
 			}else{
 				document.getElementById("answerButton").disabled = true;
 				document.getElementById("systemAnswer").value = "";
-				document.getElementById("userAnswer").value = "";
+				//document.getElementById("userAnswer").value = "";
 				document.getElementById("userResult").innerHTML = "";
 				if(mode == -1){
 					document.getElementById("inputMathForm").innerHTML = "<strong>再來選擇Step mode或是Run all mode，或者你可以自我測驗於(你可以在這裡輸入你的答案)那邊輸入你覺得轉換後的式子，再按下CheckAnswer鈕</strong>";
