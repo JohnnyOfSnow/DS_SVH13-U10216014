@@ -54,6 +54,9 @@
 								<input type="radio" name="mode" value="Run all" onClick = "modeChoice();">Run all
 							</td>
 							<td>
+								<input type="radio" name="mode" value="Self Test" onClick = "modeChoice();">Self Test
+							</td>
+							<td>
 								<p id = "modeWord"></p>
 							</td>
 						</tr>	
@@ -248,6 +251,7 @@
 		function modeChoice(){
 			clearInterval(myTimer);
 			dataDelete();
+			speedClear();
 			var form = document.getElementById("mathForm");
 			var result = document.getElementById("modeWord");
 		
@@ -265,12 +269,18 @@
 				}
 				document.getElementById("stepButton").disabled = false;
 				speedClear();
+			}else if(mode == 1){
+				for (var i = 0; i < form.speed.length; i++) {
+					form.speed[i].disabled = false;
+				}
+				document.getElementById("stepButton").disabled = true;
 			}else{
 				for (var i = 0; i < form.speed.length; i++) {
 					form.speed[i].disabled = false;
 				}
 				document.getElementById("stepButton").disabled = true;
 			}
+			document.getElementById("speedWord").innerHTML = "";
 			process();
 		}// end function modeChoice()
 
@@ -314,6 +324,7 @@
 			result.innerHTML = "";
 			speed = -1;
 			document.getElementById("speedWord").innerHTML = "";
+			document.getElementById("speedDisplay").innerHTML = "";
 			process();
 		}// end function modeClear()
 
@@ -1015,36 +1026,46 @@
 				//document.getElementById("userAnswer").value = "";
 				document.getElementById("userResult").innerHTML = "";
 				if(mode == -1){
-					document.getElementById("inputMathForm").innerHTML = "<strong>再來選擇Step mode或是Run all mode，或者你可以自我測驗於(你可以在這裡輸入你的答案)那邊輸入你覺得轉換後的式子，再按下CheckAnswer鈕</strong>";
+					document.getElementById("inputMathForm").innerHTML = "<strong>再來選擇Step mode或是Run all mode</strong>";
 					document.getElementById("stepButton").disabled = true;
 					document.getElementById("runAllButton").disabled = true;
 					document.getElementById("modePrompt").style.backgroundColor = "#ff6";
-					document.getElementById("userInputAnswer").style.backgroundColor = "#ff6";
-					document.getElementById("answerButton").disabled = false;
 				}else if(mode == 1){
 					if(speed == -1){
-						document.getElementById("inputMathForm").innerHTML = "<strong>你選擇Run all，請你選擇速度，或者你可以自我測驗於(你可以在這裡輸入你的答案)那邊輸入你覺得轉換後的式子，再按下CheckAnswer鈕</strong>";
+						document.getElementById("inputMathForm").innerHTML = "<strong>你選擇Run all，請你選擇速度</strong>";
 						// you can choose a run all
-						document.getElementById("answerButton").disabled = false;
 						document.getElementById("stepButton").disabled = true;
 						document.getElementById("runAllButton").disabled = false;
 						document.getElementById("speedPrompt").style.backgroundColor = "#ff6";
-						document.getElementById("userInputAnswer").style.backgroundColor = "#ff6";
 					}else{
-						document.getElementById("inputMathForm").innerHTML = "<strong>你選擇Run all，而且你選了速度，現在你可以按下Run all按鈕，或者你可以自我測驗於(你可以在這裡輸入你的答案)那邊輸入你覺得轉換後的式子，再按下CheckAnswer鈕</strong>";
+						document.getElementById("inputMathForm").innerHTML = "<strong>你選擇Run all，而且你選了速度，現在你可以按下Run all按鈕</strong>";
 						document.getElementById("stepButton").disabled = true;
 						document.getElementById("runAllButton").disabled = false;
-						document.getElementById("answerButton").disabled = false;
 						document.getElementById("runAllPrompt").style.backgroundColor = "#ff6";
-						document.getElementById("userInputAnswer").style.backgroundColor = "#ff6";
 					}
 				}else if(mode == 0){
-					document.getElementById("inputMathForm").innerHTML = "<strong>你選擇Step mode，現在你可以按下Next按鈕，觀看轉換的每一步驟，或者你可以自我測驗於(你可以在這裡輸入你的答案)那邊輸入你覺得轉換後的式子，再按下CheckAnswer鈕</strong>";
-					document.getElementById("stepModePrompt").style.backgroundColor = "#ff6";
-					document.getElementById("userInputAnswer").style.backgroundColor = "#ff6";
 					document.getElementById("speedWord").innerHTML = "";
-					document.getElementById("answerButton").disabled = false;
+					document.getElementById("inputMathForm").innerHTML = "<strong>你選擇Step mode，現在你可以按下Next按鈕，觀看轉換的每一步驟</strong>";
+					document.getElementById("stepModePrompt").style.backgroundColor = "#ff6";
+					document.getElementById("speedWord").innerHTML = "";
 					document.getElementById("runAllButton").disabled = true;
+				}else if(mode == 2){
+					var form = document.getElementById("mathForm");
+					var result = document.getElementById("speedWord");
+		
+					for (var i = 0; i < form.speed.length; i++) {
+						form.speed[i].checked = false;
+						form.speed[i].disabled = true;
+					}
+					result.innerHTML = "";
+					speed = -1;
+					document.getElementById("speedWord").innerHTML = "";
+					
+					document.getElementById("inputMathForm").innerHTML = "<strong>你可以自我測驗於(你可以在這裡輸入你的答案)那邊輸入你覺得轉換後的式子，再按下CheckAnswer鈕</strong>";
+					document.getElementById("userInputAnswer").style.backgroundColor = "#ff6";
+					document.getElementById("answerButton").disabled = false;
+				}else{
+				
 				}
 			}
 		}
@@ -1079,6 +1100,12 @@
 				document.getElementById("userResult").innerHTML = "答錯";
 				document.getElementById("inputMathForm").innerHTML = "<strong>可惜，你答錯了，你可能輸入答案時沒有各數字或運算子空一格，或是中間步驟可能出錯</strong>";
 			}
+			
+			var form = document.getElementById("mathForm");
+
+			for (var i = 0; i < form.mode.length; i++) {
+				form.mode[i].disabled = true;
+			}	
 
 		}
 
