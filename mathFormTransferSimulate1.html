@@ -121,7 +121,7 @@
 					-->
 					<table>
 						<tr>
-							<td><input type = "button" style=" width:130px;height:30px;font-size:15px; border:2px green solid" value = "Clear all" onClick = "clearAll();" id = "clearButton"></td>
+							<td><input type = "button" style=" width:130px;height:30px;font-size:15px; border:2px green solid" value = "Clear all" onClick = "clearAll();" id = "clearButton" disabled="false"></td>
 							<td><input type = "button" style="width:130px;height:30px;font-size:15px; border:2px green solid" value = "Check answer" onClick = "checkAnswer();" id = "answerButton" disabled="true"></td>
 						</tr>
 					</table>
@@ -1007,6 +1007,7 @@
 		}
 
 		function process(){
+			document.getElementById("clearButton").disabled = false;
 			document.getElementById("inputMathFormPrompt").style.backgroundColor = "#fff";
 			document.getElementById("changeTo").style.backgroundColor = "#fff";
 			document.getElementById("modePrompt").style.backgroundColor = "#fff";
