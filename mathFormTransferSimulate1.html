@@ -28,6 +28,7 @@
 						<tr>
 							<td><p id = "inputMathFormPrompt">輸入中序：</p></td>
 							<td><input type=text value="" id = inputInfix size="30" ></td>
+							<td><p id = "fixCheck"></p></td>
 						</tr>	
 					</table>
 					<table>
@@ -210,12 +211,12 @@
 		var medSpeed = 2000;
 		var highSpeed = 1000;
 
-		function fixChoice(){
+		function fixChoice(){		
 			clearInterval(myTimer);
 			dataDelete();
 			var form = document.getElementById("mathForm");
 			var result = document.getElementById("fixWord");
-		
+			checkInfix();
 			for (var i = 0; i < form.fix.length; i++) {
 				if ( form.fix[i].checked ) {
 					result.innerHTML = "<strong>"+"選擇 " + form.fix[i].value + "</strong>";
@@ -225,7 +226,7 @@
 					}			
 					break;
 				}
-			}
+			}	
 			process();
 		}// end function fixChoice()
 
@@ -328,6 +329,57 @@
 			document.getElementById("speedDisplay").innerHTML = "";
 			process();
 		}// end function modeClear()
+		
+		function checkInfix(){
+			var infixCheckArray;
+			var wrongInput = 0;
+			var fixString = document.getElementById("inputInfix");
+			if(fixString.value != ""){
+				infixCheckArray = (fixString.value).split(""); // sperate the string user input
+				for(var count = 0; count < infixCheckArray.length; count++){
+					switch(infixCheckArray[count]){
+						case "0":
+						case "1":
+						case "2":
+						case "3":
+						case "4":
+						case "5":
+						case "6":
+						case "7":
+						case "8":
+						case "9":
+						case "+":
+						case "-":
+						case "*":
+						case "/":
+						case "(":
+						case ")": 
+							if(wrongInput){
+							
+							}else{
+								wrongInput = 0;
+							}
+						break;
+						default:
+							wrongInput = 1;
+					}
+				}
+			}else{
+				wrongInput = 1;
+			}
+			
+			if(wrongInput){
+				document.getElementById("fixCheck").innerHTML = "中序輸入錯誤";
+				modeClear();
+				speedClear();
+				fixClear();
+				dataDelete();
+				
+			}else{
+				document.getElementById("fixCheck").innerHTML = "";
+				document.getElementById("inputInfix").disabled = true;
+			}
+		}
 
 		function fixPreHandle(){
 			var fixString = document.getElementById("inputInfix");
@@ -965,6 +1017,7 @@
 			document.getElementById("selfTestResult").style.backgroundColor = "#fff";
 			document.getElementById("userInputAnswer").style.backgroundColor = "#fff";
 			document.getElementById("speedWord").innerHTML = "";
+			document.getElementById("inputInfix").disabled = false;
 			fixString = "";
 			stackStringStore = "";
 			outputStringStore = "";
@@ -982,6 +1035,7 @@
 		}
 
 		function clearAll(){
+			document.getElementById("fixCheck").innerHTML = "";
 			document.getElementById("inputInfix").value = ""; // text field clear data should use the value attribute.
 			document.getElementById("systemAnswer").value = "";
 			document.getElementById("userAnswer").value = "";
@@ -1029,11 +1083,12 @@
 				//document.getElementById("userAnswer").value = "";
 				document.getElementById("userResult").innerHTML = "";
 				if(mode == -1){
-					document.getElementById("inputMathForm").innerHTML = "<strong>再來選擇Step mode或是Run all mode</strong>";
+					document.getElementById("inputMathForm").innerHTML = "<strong>再來選擇Step mode、Run all mode、self test mode</strong>";
 					document.getElementById("stepButton").disabled = true;
 					document.getElementById("runAllButton").disabled = true;
 					document.getElementById("modePrompt").style.backgroundColor = "#ff6";
 				}else if(mode == 1){
+					document.getElementById("inputInfix").disabled = true;
 					if(speed == -1){
 						document.getElementById("inputMathForm").innerHTML = "<strong>你選擇Run all，請你選擇速度</strong>";
 						// you can choose a run all
@@ -1047,12 +1102,14 @@
 						document.getElementById("runAllPrompt").style.backgroundColor = "#ff6";
 					}
 				}else if(mode == 0){
+					document.getElementById("inputInfix").disabled = true;
 					document.getElementById("speedWord").innerHTML = "";
 					document.getElementById("inputMathForm").innerHTML = "<strong>你選擇Step mode，現在你可以按下Next按鈕，觀看轉換的每一步驟</strong>";
 					document.getElementById("stepModePrompt").style.backgroundColor = "#ff6";
 					document.getElementById("speedWord").innerHTML = "";
 					document.getElementById("runAllButton").disabled = true;
 				}else if(mode == 2){
+					document.getElementById("inputInfix").disabled = true;
 					var form = document.getElementById("mathForm");
 					var result = document.getElementById("speedWord");
 		
