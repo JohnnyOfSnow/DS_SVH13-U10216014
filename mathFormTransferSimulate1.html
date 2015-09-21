@@ -279,6 +279,7 @@
 					form.speed[i].disabled = false;
 				}
 				document.getElementById("stepButton").disabled = true;
+				document.getElementById("runAllButton").disabled = true;
 			}
 			document.getElementById("speedWord").innerHTML = "";
 			process();
@@ -1014,6 +1015,7 @@
 			document.getElementById("speedPrompt").style.backgroundColor = "#fff";
 			document.getElementById("stepModePrompt").style.backgroundColor = "#fff";
 			document.getElementById("runAllPrompt").style.backgroundColor = "#fff";
+			document.getElementById("userInputAnswer").style.backgroundColor = "#fff";
 			if(fix == -1){
 				document.getElementById("inputMathForm").innerHTML = "這是一個可以輸入數學中序式後，可以轉成前序或後序式的模擬程式，<strong>現在請你輸入中序式後選擇轉成前序還是後序</strong>";
 				document.getElementById("stepButton").disabled = true;
