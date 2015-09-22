@@ -9,4 +9,8 @@ This DS_SVH13-U10216014 will be two program.
 
 1.simulate: the program that you can choose some options for simulating the step of changing the infix to prefix or postfix.
 
-2.test: If you do well in this part, and you can open this program. A random question 
+2.test: If you do well in this part, and you can open this program. 
+
+        A: self-test: User can input a infix, and user can answer the question that user gives.
+        
+        B: test mode: Choose it, a random infix will be generated,no hint. 
