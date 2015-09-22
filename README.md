@@ -11,6 +11,6 @@ This DS_SVH13-U10216014 will be two program.
 
 2.test: If you do well in this part, and you can open this program. 
 
-        A: self-test: User can input a infix, and user can answer the question that user gives.
+A: self-test: User can input a infix, and user can answer the question that user gives.
         
-        B: test mode: Choose it, a random infix will be generated,no hint. 
+B: test mode: Choose it, a random infix will be generated,no hint. 
