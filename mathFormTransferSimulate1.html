@@ -210,6 +210,11 @@
 		var lowSpeed = 3000;
 		var medSpeed = 2000;
 		var highSpeed = 1000;
+		const EMPTY = 0;
+		const OPERAND = 1;
+		const OPERATOR = 2;
+		const OpenParenthesis = 3;  // (
+		const ClosenParenthesis = 4;  // )
 
 		function fixChoice(){		
 			clearInterval(myTimer);
@@ -330,31 +335,33 @@
 			process();
 		}// end function modeClear()
 		
+		
+		
 		function judgeInfix(currentCha, nextCha){
 			switch(currentCha){
-				case 0:
+				case EMPTY: // " "
 						return 0;
 				break;
-				case 1:
-					if(nextCha == 3){
+				case OPERAND: // 0~9
+					if(nextCha == OpenParenthesis){ // 0~9 (   is a wrong infix
 						return 1;
 					}
 					return 0;	
 				break;
-				case 2:
-					if(nextCha == 2 ||nextCha == 4){
+				case OPERATOR: // + - * /
+					if(nextCha == OPERATOR || nextCha == ClosenParenthesis){ // + + , and + ) are wrong infixes.
 						return 1;
 					}
 					return 0;
 				break;
-				case 3:
-					if(nextCha == 3 || nextCha == 4){
+				case OpenParenthesis: // (
+					if(nextCha == OPERATOR || nextCha == ClosenParenthesis){ // ( + , and ( ) are wrong infixes. 
 						return 1;
 					}
 					return 0;
 				break;
-				case 4:
-					if(nextCha == 1 || nextCha == 3){
+				case ClosenParenthesis: // )
+					if(nextCha == OPERAND || nextCha == OpenParenthesis){ // ) 0~9 , and ) ( are wrong infixes.
 						return 1;
 					}
 					return 0;
@@ -371,6 +378,7 @@
 			// operator: + - * /  operand: 0~9
 			var currentCha = 0;
 			var nextCha = 0;
+			var parenthesisCount = 0; // ( +1, ) -1;
 			
 			if(fixString.value != ""){
 				infixCheckArray = (fixString.value).split(""); // sperate the string user input
@@ -386,7 +394,7 @@
 						case "7":
 						case "8":
 						case "9":
-							if(wrongInput == 1){
+							if(wrongInput){
 								
 							}else{
 								if(currentCha == 0){
@@ -415,6 +423,7 @@
 							}
 						break;
 						case "(":
+							parenthesisCount++;
 							if(wrongInput){
 							
 							}else{
@@ -435,6 +444,7 @@
 							
 						break;
 						case ")": 
+							parenthesisCount--;
 							if(wrongInput){
 							
 							}else{
@@ -458,6 +468,60 @@
 				}
 			}else{
 				wrongInput = 1;
+			}
+			
+			if(parenthesisCount == 0){
+				if(wrongInput){
+							
+				}else{
+					wrongInput = 0;
+				}
+			}else{
+				wrongInput = 1;
+			}
+			
+			switch(infixCheckArray[infixCheckArray.length - 1]){
+				case "0":
+				case "1":
+				case "2":
+				case "3":
+				case "4":
+				case "5":
+				case "6":
+				case "7":
+				case "8":
+				case "9":
+				case ")":
+					if(wrongInput){
+							
+					}else{
+						wrongInput = 0;
+					}
+				break;
+				default:
+					wrongInput = 1;
+			}
+			
+			switch(infixCheckArray[0]){
+				case "0":
+				case "1":
+				case "2":
+				case "3":
+				case "4":
+				case "5":
+				case "6":
+				case "7":
+				case "8":
+				case "9":
+				case "(":
+					if(wrongInput){
+							
+					}else{
+						wrongInput = 0;
+					}
+				break;
+				default:
+					wrongInput = 1;
 			}
 			
 			if(wrongInput){
