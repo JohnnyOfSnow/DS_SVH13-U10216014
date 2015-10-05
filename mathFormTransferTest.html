@@ -1,0 +1,1288 @@
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<title>Mathematic Form Transfer Simulation</title>
+		<style>
+			canvas{
+				border: solid 1px green;
+			}
+		</style>
+	</head>
+	<body>
+		<!--
+						table design reference:
+						http://www.wibibi.com/info.php?tid=441
+		-->
+		<table>
+				<tr>
+					<td><p id = "inputMathForm">這是一個可以輸入數學中序式後，可以轉成前序或後序式的模擬程式</p></td>
+				</tr>	
+		</table>
+		<hr>	
+		<form name = "mathForm" id="mathForm">
+			<table  style="border:3px #FFD382 dashed;" cellpadding="10" >
+				<tr>
+					<td>
+					<table>
+						<tr>
+							<td><p id = "modePrompt">操作模式：</p></td>
+							<td>
+								<input type="radio" name="mode" value="電腦出題" onClick = "modeChoice();">電腦出題
+							</td>
+							<td>
+								<input type="radio" name="mode" value="自己出題" onClick = "modeChoice();">自己出題
+							</td>
+							
+							<td>
+								<p id = "modeWord"></p>
+							</td>
+						</tr>	
+					</table>
+					<table>
+						<tr>
+							<td><p id = "inputMathFormPrompt">輸入中序：</p></td>
+							<td><input type=text value="" id = inputInfix size="30" ></td>
+							<td><p id = "fixCheck"></p></td>
+						</tr>	
+					</table>
+					<table>
+						<tr>
+							<td><p id = "changeTo">轉換為：</p></td>
+							<td>
+								<input type="radio" name="fix" value="前序" onClick = "fixChoice();">前序
+							</td>
+							<td>
+								<input type="radio" name="fix" value="後序" onClick = "fixChoice();">後序
+							</td>
+							<td>
+								<p id = "fixWord"></p>
+							</td>
+						</tr>	
+					</table>
+					
+					<table>
+						<tr>
+							<td><p id = "speedPrompt">Speed：</p></td>
+							<td>
+								<input type="radio" name="speed" value="快" onClick = "speedChoice();">快
+							</td>
+							<td>
+								<input type="radio" name="speed" value="中" onClick = "speedChoice();">中
+							</td>
+							<td>
+								<input type="radio" name="speed" value="慢" onClick = "speedChoice();">慢
+							</td>
+							<td>
+								<p id = "speedWord"></p>
+							</td>
+						</tr>	
+					</table>
+
+					<table>
+						<tr>
+							<td><p id = "stepModePrompt">Step mode請按這；</p></td>
+							<td><input type = "button" style=" width:100px;height:30px;font-size:15px;border:2px green solid " value = "Next" onClick = "stepExe();" id = "stepButton" disabled="true"></td>
+						</tr>
+					</table>
+
+					
+
+					<table>
+						<tr>
+							<td><p id = "userInputAnswer">你可以在這裡輸入你的答案：</p></td>
+							<td><input type=text value="" id=userAnswer size="30" ></td>
+						</tr>
+					</table>
+
+					<table>
+						<tr>
+							<td><p id = "ststemPrompt">系統處理結果：</p></td>
+							<td><input type=text value="" id=systemAnswer size="30" readonly="readonly"></td>
+						</tr>
+					</table>
+
+					<table>
+						<tr>
+							<td><p id = "selfTestResult">Self-test比對結果：</p></td>
+							<td><p id = "userResult"></p></td>
+						</tr>
+					</table>
+
+					<!--
+						Button design reference:
+						http://csscodefile.blogspot.tw/2015/03/html-button.html
+					-->
+					<table>
+						<tr>
+							<td><input type = "button" style=" width:130px;height:30px;font-size:15px; border:2px green solid" value = "Clear all" onClick = "clearAll();" id = "clearButton" disabled="false"></td>
+							<td><input type = "button" style="width:130px;height:30px;font-size:15px; border:2px green solid" value = "Check answer" onClick = "checkAnswer();" id = "answerButton" disabled="true"></td>
+						</tr>
+					</table>
+					<td>
+					<td>
+						<table>
+							<tr>
+								<td><p id = "stackWord">Stack狀態：</p></td>
+							</tr>
+							<tr>
+								<td><input type=text style="border-top:3px black solid; border-left:3px black solid; border-bottom:3px black solid;" value="" id=stackText size="80" readonly="readonly"></td>	
+							</tr>
+						</table>
+
+						<table>
+							<tr>
+								<td><p id = "location">↑top</p></td>
+								
+							</tr>
+							
+						</table>
+
+						<table>
+							<tr>
+								<td><p id = "outputWord">output：</p></td>
+								
+							</tr>
+							
+							
+							<tr>
+								<td><input type=text value="" id=outputText size="80" readonly="readonly"></td>
+							</tr>
+						</table>
+
+						<table>
+							<tr>
+								<td><p id = "allStepWord">目前過程：</p></td>
+								
+							</tr>
+							<tr>
+								<td><textarea name="Content" style="width:570px;height:100px;" id=currentStepTextArea readonly="readonly" ></textarea></td>
+							</tr>
+						</table>
+
+						<table>
+							<tr>
+								<td><p id = "allStepWord">轉換過程：</p></td>
+								
+							</tr>
+							<tr>
+								<td><textarea name="Content" style="width:570px;height:200px;" id=allStepTextArea readonly="readonly" ></textarea></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</form>
+	</body>
+	<script>
+		// The function will be invoke, when you open the HTML file
+		window.onload = function (){
+			clearInterval(myTimer);
+			clearAll();
+		}
+
+		var mode = -1;
+		var speed = -1;
+		var fix = -1;// fix = 0 prefix,fix = 1 postfix
+		var fixString = "";
+		var infixArray;
+		var stackStringStore = "";
+		var outputStringStore = "";
+		var infixArrayIndex = 0;
+		var popContinue = 0;
+		var first = 1;
+		var allStepWordString = "";
+		var step = 0;
+		var currentStr = "";
+		var operator = "";
+		var firstFind = 1;
+		var isAlreadyDecide = 0;
+		var oldCurrent = "";
+		var oldAllStep = "";
+		var myTimer;
+		var lowSpeed = 3000;
+		var medSpeed = 2000;
+		var highSpeed = 1000;
+		const EMPTY = 0;
+		const OPERAND = 1;
+		const OPERATOR = 2;
+		const OpenParenthesis = 3;  // (
+		const ClosenParenthesis = 4;  // )
+
+		function fixChoice(){		
+			clearInterval(myTimer);
+			dataDelete();
+			var form = document.getElementById("mathForm");
+			var result = document.getElementById("fixWord");
+			checkInfix();
+			for (var i = 0; i < form.fix.length; i++) {
+				if ( form.fix[i].checked ) {
+					result.innerHTML = "<strong>"+"選擇 " + form.fix[i].value + "</strong>";
+					fix = i;
+					for (var i = 0; i < form.mode.length; i++) {
+						form.mode[i].disabled = false;
+					}			
+					break;
+				}
+			}
+
+			if(mode == 1){ // user choose 
+			
+			}
+			process();
+		}// end function fixChoice()
+
+		function fixClear(){
+			clearInterval(myTimer);
+			var form = document.getElementById("mathForm");
+			var result = document.getElementById("fixWord");
+			for (var i = 0; i < form.fix.length; i++) {
+				form.fix[i].checked = false;
+			}
+
+			result.innerHTML = "";
+
+			for (var i = 0; i < form.fix.length; i++) {
+				form.fix[i].disabled = true;
+			}	
+
+			
+			fix = -1;
+			process();
+		}// end function fixClear()
+
+		function modeChoice(){
+			clearInterval(myTimer);
+			dataDelete();
+			speedClear();
+			var form = document.getElementById("mathForm");
+			var result = document.getElementById("modeWord");
+		
+			for (var i = 0; i < form.mode.length; i++) {
+				if ( form.mode[i].checked ) {
+					result.innerHTML = "<strong>" + "選擇 " + form.mode[i].value + "</strong>";
+					mode = i;			
+					break;
+				}
+			}
+			if(mode == 0){
+				
+				document.getElementById("stepButton").disabled = true;
+				speedClear();
+			}else if(mode == 1){
+				
+				document.getElementById("stepButton").disabled = false;
+			}else{
+				
+				document.getElementById("stepButton").disabled = true;
+				document.getElementById("runAllButton").disabled = true;
+			}
+			document.getElementById("speedWord").innerHTML = "";
+			process();
+		}// end function modeChoice()
+
+		function modeClear(){
+			clearInterval(myTimer);
+			var form = document.getElementById("mathForm");
+			var result = document.getElementById("modeWord");
+			for (var i = 0; i < form.mode.length; i++) {
+				form.mode[i].checked = false;
+
+			}
+			result.innerHTML = "";
+			mode = -1;
+			process();
+		}// end function modeClear()
+
+		function speedChoice(){
+			clearInterval(myTimer);
+			var form = document.getElementById("mathForm");
+			var result = document.getElementById("speedWord");
+		
+			for (var i = 0; i < form.speed.length; i++) {
+				if ( form.speed[i].checked ) {
+					result.innerHTML = "<strong>" + "選擇 " + form.speed[i].value + "速</strong>";
+					speed = i;			
+					break;
+				}
+			}
+			process();
+		}// end function modeChoice()
+
+		function speedClear(){
+			clearInterval(myTimer);
+			var form = document.getElementById("mathForm");
+			var result = document.getElementById("speedWord");
+		
+			for (var i = 0; i < form.speed.length; i++) {
+				form.speed[i].checked = false;
+				form.speed[i].disabled = true;
+			}
+			result.innerHTML = "";
+			speed = -1;
+			document.getElementById("speedWord").innerHTML = "";
+			
+			process();
+		}// end function modeClear()
+		
+		
+		
+		function judgeInfix(currentCha, nextCha){
+			switch(currentCha){
+				case EMPTY: // " "
+						return 0;
+				break;
+				case OPERAND: // 0~9
+					if(nextCha == OpenParenthesis){ // 0~9 (   is a wrong infix
+						return 1;
+					}
+					return 0;	
+				break;
+				case OPERATOR: // + - * /
+					if(nextCha == OPERATOR || nextCha == ClosenParenthesis){ // + + , and + ) are wrong infixes.
+						return 1;
+					}
+					return 0;
+				break;
+				case OpenParenthesis: // (
+					if(nextCha == OPERATOR || nextCha == ClosenParenthesis){ // ( + , and ( ) are wrong infixes. 
+						return 1;
+					}
+					return 0;
+				break;
+				case ClosenParenthesis: // )
+					if(nextCha == OPERAND || nextCha == OpenParenthesis){ // ) 0~9 , and ) ( are wrong infixes.
+						return 1;
+					}
+					return 0;
+				break;
+				default:
+					return 1;
+			}
+		}
+		
+		function checkInfix(){
+			var infixCheckArray;
+			var wrongInput = 0;
+			var fixString = document.getElementById("inputInfix");
+			// operator: + - * /  operand: 0~9
+			var currentCha = 0;
+			var nextCha = 0;
+			var parenthesisCount = 0; // ( +1, ) -1;
+			
+			if(fixString.value != ""){
+				infixCheckArray = (fixString.value).split(""); // sperate the string user input
+				for(var count = 0; count < infixCheckArray.length; count++){
+					switch(infixCheckArray[count]){
+						case "0":
+						case "1":
+						case "2":
+						case "3":
+						case "4":
+						case "5":
+						case "6":
+						case "7":
+						case "8":
+						case "9":
+							if(wrongInput){
+								
+							}else{
+								if(currentCha == 0){
+									currentCha = 1;
+								}else{
+									nextCha = 1;
+									wrongInput = judgeInfix(currentCha, nextCha);
+									currentCha = nextCha;
+								}
+							}
+						break;
+						case "+":
+						case "-":
+						case "*":
+						case "/":
+							if(wrongInput){
+								
+							}else{
+								if(currentCha == 0){
+									currentCha = 2;
+								}else{
+									nextCha = 2;
+									wrongInput = judgeInfix(currentCha, nextCha);
+									currentCha = nextCha;
+								}
+							}
+						break;
+						case "(":
+							parenthesisCount++;
+							if(wrongInput){
+							
+							}else{
+								wrongInput = 0;
+								if(wrongInput){
+								
+								}else{
+									if(currentCha == 0){
+										currentCha = 3;
+									}else{
+										nextCha = 3;
+										wrongInput = judgeInfix(currentCha, nextCha);
+										currentCha = nextCha;
+									}
+								}
+							}
+							
+							
+						break;
+						case ")": 
+							parenthesisCount--;
+							if(wrongInput){
+							
+							}else{
+								wrongInput = 0;
+								if(wrongInput){
+								
+								}else{
+									if(currentCha == 0){
+										currentCha = 4;
+									}else{
+										nextCha = 4;
+										wrongInput = judgeInfix(currentCha, nextCha);
+										currentCha = nextCha;
+									}
+								}
+							}
+						break;
+						default:
+							wrongInput = 1;
+					}
+				}
+			}else{
+				wrongInput = 1;
+			}
+			
+			if(parenthesisCount == 0){
+				if(wrongInput){
+							
+				}else{
+					wrongInput = 0;
+				}
+			}else{
+				wrongInput = 1;
+			}
+			
+			switch(infixCheckArray[infixCheckArray.length - 1]){
+				case "0":
+				case "1":
+				case "2":
+				case "3":
+				case "4":
+				case "5":
+				case "6":
+				case "7":
+				case "8":
+				case "9":
+				case ")":
+					if(wrongInput){
+							
+					}else{
+						wrongInput = 0;
+					}
+				break;
+				default:
+					wrongInput = 1;
+			}
+			
+			switch(infixCheckArray[0]){
+				case "0":
+				case "1":
+				case "2":
+				case "3":
+				case "4":
+				case "5":
+				case "6":
+				case "7":
+				case "8":
+				case "9":
+				case "(":
+					if(wrongInput){
+							
+					}else{
+						wrongInput = 0;
+					}
+				break;
+				default:
+					wrongInput = 1;
+			}
+			
+			if(wrongInput){
+				document.getElementById("fixCheck").innerHTML = "中序輸入錯誤";
+				modeClear();
+				speedClear();
+				fixClear();
+				dataDelete();
+				
+			}else{
+				document.getElementById("fixCheck").innerHTML = "";
+				document.getElementById("inputInfix").disabled = true;
+			}
+		}
+
+		function fixPreHandle(){
+			var fixString = document.getElementById("inputInfix");
+			var temp;// is a character array
+			var str = ""; // temporarily store digit.
+			var first = 1;
+			var digitIsNeedToFind = 0;
+			//if(mode != -1){ // choose mode
+				if(fix != -1){ // choose fix
+					if(fixString.value != ""){
+						temp = (fixString.value).split(""); // sperate the string user input
+						
+						for(var count = 0; count < temp.length; count++){
+							
+							switch(temp[count]){
+								case "0":
+								case "1":
+								case "2":
+								case "3":
+								case "4":
+								case "5":
+								case "6":
+								case "7":
+								case "8":
+								case "9":
+									str = str + temp[count];
+									digitIsNeedToFind = 1;// Maybe the number is tens, hundreds, etc.
+								break;
+								case "+":
+								case "-":
+								case "*":
+								case "/":
+								case "(":
+								case ")":
+									if(digitIsNeedToFind == 1){
+										if(first == 1){
+											fixString = str;
+											first = 0;
+											str = "";
+											digitIsNeedToFind = 0;
+											count = count - 1;
+										}else{
+											fixString = fixString + " " + str;
+											count = count - 1;
+											digitIsNeedToFind = 0;
+											str = "";
+										}
+										
+									}else{
+										if(first == 1){
+											fixString = temp[count];
+											first = 0;
+										}else{
+											fixString = fixString + " " + temp[count];
+										}
+									}
+								break;
+								default:
+									if(digitIsNeedToFind == 1){
+										if(first == 1){
+											fixString = temp[count];
+											first = 0;
+										}else{
+											fixString = fixString + " " + str;
+											digitIsNeedToFind = 0;
+											str = "";
+										}	
+									}
+							}// end switch
+						}// end for loop
+
+						if(str != ""){ // reserve character need to check
+							fixString = fixString + " " + str;
+						}
+						infixArray = fixString.split(" "); 
+						//document.getElementById("currentStepTextArea").innerHTML = fixString;
+						if(fix == 0){
+							infixArrayIndex = (infixArray.length) - 1;
+						}
+					}else{
+						step = 2; // wrong input handle
+
+					}
+				}// end if
+			//}// end if
+		}// end function fixPreHandle()
+
+		function doPostfix(){
+			
+			if(infixArray[infixArrayIndex] == ")"){
+				if(popContinue == 0){
+					currentStr = currentStr + "\n--->遇到 ) 開始pop堆疊直到遇見 ( ";
+					popContinue = 1;
+				}else{
+
+				}	
+			}
+			if(popContinue == 1){
+				doStackPop();
+			}else{
+				if(!isNaN(infixArray[infixArrayIndex])){
+					if(first == 1){
+						currentStr = currentStr + "\n--->輸出 " + infixArray[infixArrayIndex] + "到後端";
+						outputStringStore = infixArray[infixArrayIndex];
+						first = 0;
+						infixArrayIndex++;
+					}else{
+						currentStr = currentStr + "\n--->輸出 " + infixArray[infixArrayIndex] + "到後端";
+						outputStringStore = outputStringStore + " " + infixArray[infixArrayIndex];
+						infixArrayIndex++;
+					}
+				}else{
+					if(doStackPeek() == "empty"){
+						currentStr = currentStr + "\n--->堆疊為空 " + infixArray[infixArrayIndex] + " 壓入堆疊";
+						doStackPush(infixArray[infixArrayIndex]);
+						infixArrayIndex++;
+					}else{
+						if(getScanPriority(infixArray[infixArrayIndex]) > getStackUpperPriority(doStackPeek())){
+							currentStr = currentStr + "\n--->因為 " + infixArray[infixArrayIndex] + " 的優先權比 " + doStackPeek() + " 還高，直接壓入堆疊";
+							doStackPush(infixArray[infixArrayIndex]);
+							infixArrayIndex++;
+						}else if(getScanPriority(infixArray[infixArrayIndex]) == getStackUpperPriority(doStackPeek())){
+							currentStr = currentStr + "\n--->因為 " + infixArray[infixArrayIndex] + " 的優先權和 " + doStackPeek() + " 一樣";
+							currentStr = currentStr + "\n--->要壓入 " + infixArray[infixArrayIndex] + " 需先pop出 " + doStackPeek();
+							doStackPop();
+							currentStr = currentStr + "\n--->但是你得繼續和堆疊的上層運算子繼續比較";
+							
+							step = 4;
+							firstFind = 1;
+							decideWhatTimeCanPushInStack();
+							
+						}else{
+							currentStr = currentStr + "\n--->因為 " + infixArray[infixArrayIndex] + " 的優先權比 " + doStackPeek() + " 小";
+							currentStr = currentStr + "\n--->要壓入 " + infixArray[infixArrayIndex] + " 需先pop出 " + doStackPeek();
+							doStackPop();
+							currentStr = currentStr + "\n--->但是你得繼續和堆疊的上層運算子繼續比較";
+							step = 4;
+							firstFind = 1;
+							decideWhatTimeCanPushInStack();
+						}
+					}
+				}
+			}
+			document.getElementById("currentStepTextArea").innerHTML = currentStr;
+			allStepWordString = allStepWordString + "\n" + currentStr;
+		}
+
+		function doPrefix(){
+			
+			if(infixArray[infixArrayIndex] == "("){
+				if(popContinue == 0){
+					currentStr = currentStr + "\n--->遇到 ( 開始pop堆疊直到遇見 ) ";
+					popContinue = 1;
+				}else{
+
+				}	
+			}
+			if(popContinue == 1){
+				doStackPop();
+			}else{
+				if(!isNaN(infixArray[infixArrayIndex])){
+					if(first == 1){
+						currentStr = currentStr + "\n--->輸出 " + infixArray[infixArrayIndex] + "到前端";
+						outputStringStore = infixArray[infixArrayIndex];
+						first = 0;
+						infixArrayIndex--;
+					}else{
+						currentStr = currentStr + "\n--->輸出 " + infixArray[infixArrayIndex] + "到前端";
+						outputStringStore = infixArray[infixArrayIndex] + " " + outputStringStore;
+						infixArrayIndex--;
+					}
+				}else{
+					if(doStackPeek() == "empty"){
+						currentStr = currentStr + "\n--->堆疊為空 " + infixArray[infixArrayIndex] + " 壓入堆疊";
+						doStackPush(infixArray[infixArrayIndex]);
+						infixArrayIndex--;
+					}else{
+						if(getScanPriority(infixArray[infixArrayIndex]) > getStackUpperPriority(doStackPeek())){
+							currentStr = currentStr + "\n--->因為 " + infixArray[infixArrayIndex] + " 的優先權比 " + doStackPeek() + " 還高，直接壓入堆疊";
+							doStackPush(infixArray[infixArrayIndex]);
+							infixArrayIndex--;
+						}else if(getScanPriority(infixArray[infixArrayIndex]) == getStackUpperPriority(doStackPeek())){
+							currentStr = currentStr + "\n--->因為 " + infixArray[infixArrayIndex] + " 的優先權和 " + doStackPeek() + " 一樣，直接壓入堆疊";
+							doStackPush(infixArray[infixArrayIndex]);
+							infixArrayIndex--;
+							
+						}else{
+							currentStr = currentStr + "\n--->因為 " + infixArray[infixArrayIndex] + " 的優先權比 " + doStackPeek() + " 小";
+							currentStr = currentStr + "\n--->要壓入 " + infixArray[infixArrayIndex] + " 需先pop出 " + doStackPeek();
+							doStackPop();
+							currentStr = currentStr + "\n--->但是你得繼續和堆疊的上層運算子繼續比較";
+							step = 4;
+							firstFind = 1;
+							decideWhatTimeCanPushInStackForPrefix();
+						}
+					}
+				}
+			}
+			document.getElementById("currentStepTextArea").innerHTML = currentStr;
+			allStepWordString = allStepWordString + "\n" + currentStr;
+		}
+
+		function decideWhatTimeCanPushInStack(){
+			if(firstFind == 0){
+				if(doStackPeek() != "empty"){
+								
+					if(getScanPriority(infixArray[infixArrayIndex]) > getStackUpperPriority(doStackPeek())){
+						currentStr = currentStr + "\n最後 " + infixArray[infixArrayIndex] + " 的優先權比 " + doStackPeek() + " 還高，可以壓入堆疊";
+						doStackPush(infixArray[infixArrayIndex]);
+						infixArrayIndex++;
+						step = 1;
+						firstFind = 1;
+						isAlreadyDecide = 1;
+					}else if(getScanPriority(infixArray[infixArrayIndex]) == getStackUpperPriority(doStackPeek())){
+						currentStr = currentStr + "\n--->但是又因為 " + infixArray[infixArrayIndex] + " 的優先權和 " + doStackPeek() + "一樣";
+						doStackPop();
+						currentStr = currentStr + "\n還要繼續與堆疊頂端的運算子比較";
+
+					}else if(getScanPriority(infixArray[infixArrayIndex]) < getStackUpperPriority(doStackPeek())){
+						currentStr = currentStr + "\n--->但是又因為 " + infixArray[infixArrayIndex] + " 的優先權比 " + doStackPeek() + "小";
+						doStackPop();
+						currentStr = currentStr + "\n還要繼續與堆疊頂端的運算子比較";
+					}else{
+
+					}
+				}else{
+					currentStr = currentStr + "\n現在堆疊為空 " + infixArray[infixArrayIndex] + " 直接壓入堆疊";
+					doStackPush(infixArray[infixArrayIndex]);
+						infixArrayIndex++;
+						step = 1;
+						firstFind = 1;
+						isAlreadyDecide = 1;
+				}
+			}else{
+				firstFind = 0;
+			}
+		}
+
+		function decideWhatTimeCanPushInStackForPrefix(){
+			if(firstFind == 0){
+				if(doStackPeek() != "empty"){
+								
+					if(getScanPriority(infixArray[infixArrayIndex]) > getStackUpperPriority(doStackPeek())){
+						currentStr = currentStr + "\n最後 " + infixArray[infixArrayIndex] + " 的優先權比 " + doStackPeek() + " 還高，可以壓入堆疊";
+						doStackPush(infixArray[infixArrayIndex]);
+						infixArrayIndex--;
+						step = 1;
+						firstFind = 1;
+						isAlreadyDecide = 1;
+					}else if(getScanPriority(infixArray[infixArrayIndex]) == getStackUpperPriority(doStackPeek())){
+						currentStr = currentStr + "\n最後 " + infixArray[infixArrayIndex] + " 的優先權和 " + doStackPeek() + " 一樣，可以壓入堆疊";
+						doStackPush(infixArray[infixArrayIndex]);
+						infixArrayIndex--;
+						step = 1;
+						firstFind = 1;
+						isAlreadyDecide = 1;
+
+					}else if(getScanPriority(infixArray[infixArrayIndex]) < getStackUpperPriority(doStackPeek())){
+						currentStr = currentStr + "\n--->但是又因為 " + infixArray[infixArrayIndex] + " 的優先權比 " + doStackPeek() + "小";
+						doStackPop();
+						currentStr = currentStr + "\n還要繼續與堆疊頂端的運算子比較";
+					}else{
+
+					}
+				}else{
+					currentStr = currentStr + "\n現在堆疊為空 " + infixArray[infixArrayIndex] + " 直接壓入堆疊";
+					doStackPush(infixArray[infixArrayIndex]);
+					infixArrayIndex--;
+					step = 1;
+					firstFind = 1;
+					isAlreadyDecide = 1;
+				}
+			}else{
+				firstFind = 0;
+			}
+		}
+
+		function getScanPriority(op1){
+			switch(op1){
+				case "+":
+				case "-":
+					return 1;
+				break;
+				case "*":
+				case "/":
+					return 2;
+				break;
+				case "(":
+				case ")":
+					return 3;
+				break;
+				default:
+			}
+		}
+
+		function getStackUpperPriority(op2){
+			switch(op2){
+				case "+":
+				case "-":
+					return 1;
+				break;
+				case "*":
+				case "/":
+					return 2;
+				break;
+				case "(":
+				case ")":
+					return 0;
+				break;
+				default:
+			}
+		}
+
+		function doStackPeek(){
+			if(stackStringStore == ""){
+				return "empty"
+			}else{
+				var temp = stackStringStore.split(" "); 
+				return temp[temp.length - 1];
+			}
+		}
+
+
+		function doStackPop(){
+			if(stackStringStore == ""){
+
+			}else{
+				var temp = stackStringStore.split(" "); 
+				var newStackString = "";
+				var button = 1;
+				for(var count = 0; count < temp.length - 1; count++){
+					if(button == 1){
+						newStackString = temp[count];
+						button = 0;
+					}else{
+						newStackString = newStackString + " " + temp[count];
+					}
+				}
+				if(temp[count] == "("){
+					popContinue = 0;
+					currentStr = currentStr + "\n[Pop " + temp[count] + " 從堆疊]";
+					currentStr = currentStr + "\n遇到了 ( 了，繼續掃描下一個";
+					infixArrayIndex++;
+				}else if(temp[count] == ")"){
+					popContinue = 0;
+					currentStr = currentStr + "\n[Pop " + temp[count] + " 從堆疊]";
+					currentStr = currentStr + "\n遇到了 ) 了，繼續掃描下一個";
+					infixArrayIndex--;
+
+				}else{
+					if(fix == 0){
+						outputStringStore = temp[count] + " " + outputStringStore;
+					}else{
+						outputStringStore = outputStringStore + " " + temp[count];
+					}
+					
+					currentStr = currentStr + "\n[Pop " + temp[count] + " 從堆疊]";
+				}
+				
+				stackStringStore = newStackString;
+				var temp = stackStringStore.split(" ");
+				if(temp.length == 1){
+					document.getElementById("location").innerHTML = "<strong>↑top</strong>";
+				}else{
+					var string = "<strong>↑top</strong>";
+					var count = 0;
+					while(count < (temp.length-1)){
+						string = "--" + string;
+						count++;
+					}
+					document.getElementById("location").innerHTML = string;
+				}
+			}
+		}
+
+		function doStackPush(op){
+			if(stackStringStore == ""){
+				stackStringStore = op;
+			}else{
+				stackStringStore = stackStringStore + " " + op;
+			}
+			var temp = stackStringStore.split(" ");
+			if(temp.length == 1){
+				document.getElementById("location").innerHTML = "<strong>↑top</strong>";
+			}else{
+				var string = "<strong>↑top</strong>";
+				var count = 0;
+				while(count < (temp.length - 1)){
+					string = "--" + string;
+					count++;
+				}
+				document.getElementById("location").innerHTML = string;
+			}
+
+		}
+
+
+		function stepExe(){
+			if(fix == 1){
+				//var word = document.getElementById("allStepWordString");
+				if(step == 0){
+					currentStr = "";
+					currentStr = "開始進行中序轉後序，掃描方向為由左到右\n";
+					document.getElementById("outputText").value = outputStringStore;
+					document.getElementById("stackText").value = stackStringStore;
+					allStepWordString = currentStr;
+					document.getElementById("currentStepTextArea").innerHTML = currentStr;
+					document.getElementById("allStepTextArea").innerHTML = allStepWordString;
+					fixPreHandle();
+					step++;
+				}else if(step == 1){
+					if(infixArrayIndex < infixArray.length){
+						currentStr = "";
+						if(popContinue == 0){
+							currentStr = "\nScan: " + infixArray[infixArrayIndex];
+						}else{
+							currentStr = "\n還沒遇到 ( 需要繼續pop堆疊";
+						}	
+						
+						doPostfix();
+						document.getElementById("outputText").value = outputStringStore;
+						document.getElementById("stackText").value = stackStringStore;
+						document.getElementById("allStepTextArea").innerHTML = allStepWordString;
+						if(firstFind == 0){
+							step = 4;
+						}else{
+							step = 1;
+						}
+						
+					}else{
+						if(doStackPeek() == "empty"){
+							step = 3;
+						}else{
+							currentStr = "";
+							currentStr = "\nScan完畢，但堆疊還有運算子";
+							doStackPop();
+							document.getElementById("currentStepTextArea").innerHTML = currentStr;
+							document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value;
+							allStepWordString = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value; 
+							document.getElementById("outputText").value = outputStringStore;
+							document.getElementById("stackText").value = stackStringStore;
+							step = 2;
+						}
+						
+					}
+				}else if(step == 2){
+					if(doStackPeek() == "empty"){
+						currentStr = "";
+						currentStr = "\n中序式轉後序式結束";
+						document.getElementById("currentStepTextArea").innerHTML = currentStr;
+						document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + currentStr;
+						step = 5;
+					}else{
+						currentStr = "";
+						currentStr = "\nScan完畢，但堆疊還有運算子";
+						doStackPop();
+						document.getElementById("currentStepTextArea").innerHTML = currentStr;
+						document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value;
+						allStepWordString = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value; 
+						document.getElementById("outputText").value = outputStringStore;
+						document.getElementById("stackText").value = stackStringStore;
+						step = 2;
+					}
+
+				}else if(step == 4){
+					oldCurrent = oldCurrent + currentStr;
+					oldAllStep = allStepWordString;
+					currentStr = "";
+					decideWhatTimeCanPushInStack();
+					document.getElementById("outputText").value = outputStringStore;
+					document.getElementById("stackText").value = stackStringStore;
+					var temp = allStepWordString;
+					document.getElementById("currentStepTextArea").innerHTML = oldCurrent + "\n" + currentStr;
+					document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + currentStr;
+
+					if(isAlreadyDecide == 0){
+						allStepWordString = allStepWordString + currentStr;
+					}else{
+						isAlreadyDecide = 0;
+						oldCurrent = oldCurrent + currentStr;
+						allStepWordString = document.getElementById("allStepTextArea").value;
+						step = 1;
+						oldCurrent = "";
+						oldAllStep = "";
+						currentStr = "";
+					}
+					
+				}else if(step == 3){
+					currentStr = "";
+					currentStr = "\n中序式轉後序式結束";
+					document.getElementById("currentStepTextArea").innerHTML = currentStr;
+					document.getElementById("allStepTextArea").innerHTML = allStepWordString + currentStr;
+					step = 5;
+				}else{
+
+				}
+			}else if(fix == 0){
+				if(step == 0){
+					currentStr = "";
+					currentStr = "開始進行中序轉前序，掃描方向為由右到左\n";
+					document.getElementById("outputText").value = outputStringStore;
+					document.getElementById("stackText").value = stackStringStore;
+					allStepWordString = currentStr;
+					document.getElementById("currentStepTextArea").innerHTML = currentStr;
+					document.getElementById("allStepTextArea").innerHTML = allStepWordString;
+					//infixArrayIndex = infixArray.length - 1;
+					fixPreHandle();
+					step++;
+				}else if(step == 1){
+					if(infixArrayIndex >= 0){
+						currentStr = "";
+						if(popContinue == 0){
+							currentStr = "\nScan: " + infixArray[infixArrayIndex];
+						}else{
+							currentStr = "\n還沒遇到 ( 需要繼續pop堆疊";
+						}	
+						
+						doPrefix();
+						document.getElementById("outputText").value = outputStringStore;
+						document.getElementById("stackText").value = stackStringStore;
+						document.getElementById("allStepTextArea").innerHTML = allStepWordString;
+						if(firstFind == 0){
+							step = 4;
+						}else{
+							step = 1;
+						}
+						
+					}else{
+						if(doStackPeek() == "empty"){
+							step = 3;
+						}else{
+							currentStr = "";
+							currentStr = "\nScan完畢，但堆疊還有運算子";
+							doStackPop();
+							document.getElementById("currentStepTextArea").innerHTML = currentStr;
+							document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value;
+							allStepWordString = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value; 
+							document.getElementById("outputText").value = outputStringStore;
+							document.getElementById("stackText").value = stackStringStore;
+							step = 2;
+						}
+						
+					}
+				}else if(step == 2){
+					if(doStackPeek() == "empty"){
+						currentStr = "";
+						currentStr = "\n中序式轉前序式結束";
+						document.getElementById("currentStepTextArea").innerHTML = currentStr;
+						document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + currentStr;
+						step = 5;
+					}else{
+						currentStr = "";
+						currentStr = "\nScan完畢，但堆疊還有運算子";
+						doStackPop();
+						document.getElementById("currentStepTextArea").innerHTML = currentStr;
+						document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value;
+						allStepWordString = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value; 
+						document.getElementById("outputText").value = outputStringStore;
+						document.getElementById("stackText").value = stackStringStore;
+						step = 2;
+					}
+
+				}else if(step == 4){
+					oldCurrent = oldCurrent + currentStr;
+					oldAllStep = allStepWordString;
+					currentStr = "";
+					decideWhatTimeCanPushInStackForPrefix();
+					document.getElementById("outputText").value = outputStringStore;
+					document.getElementById("stackText").value = stackStringStore;
+					var temp = allStepWordString;
+					document.getElementById("currentStepTextArea").innerHTML = oldCurrent + "\n" + currentStr;
+					document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + currentStr;
+
+					if(isAlreadyDecide == 0){
+						allStepWordString = allStepWordString + currentStr;
+					}else{
+						isAlreadyDecide = 0;
+						oldCurrent = oldCurrent + currentStr;
+						allStepWordString = document.getElementById("allStepTextArea").value;
+						step = 1;
+						oldCurrent = "";
+						oldAllStep = "";
+						currentStr = "";
+					}
+					
+				}else if(step == 3){
+					currentStr = "";
+					currentStr = "\n中序式轉前序式結束";
+					document.getElementById("currentStepTextArea").innerHTML = currentStr;
+					document.getElementById("allStepTextArea").innerHTML = allStepWordString + currentStr;
+					step = 5;
+				}else{
+					// step 5
+					// End will enter this block.
+				}
+			}else{
+
+			}
+		}// end function stepExe()
+
+		function runAllExe(){
+				if(speed == 0){
+					document.getElementById("speedDisplay").innerHTML = "每步停留為" + (highSpeed/1000) + "秒";
+					myTimer = setInterval("stepExe()",highSpeed);
+				}else if(speed == 1){
+					document.getElementById("speedDisplay").innerHTML = "每步停留為" + (medSpeed/1000) + "秒";
+					myTimer = setInterval("stepExe()",medSpeed);
+				}else if(speed == 2){
+					document.getElementById("speedDisplay").innerHTML = "每步停留為" + (lowSpeed/1000) + "秒";
+					myTimer = setInterval("stepExe()",lowSpeed);
+				}else{
+					document.getElementById("speedDisplay").innerHTML = "你沒有選速度";
+				}
+				/*
+				while(huffmanStep != 4 && ifInputFrequency != 0){
+					stepExecute();
+				}*/
+			}
+
+		function dataDelete(){
+			
+			document.getElementById("outputText").value = "";
+			document.getElementById("stackText").value = "";;
+			document.getElementById("allStepTextArea").innerHTML = "";
+			document.getElementById("currentStepTextArea").innerHTML = "";
+			document.getElementById("userAnswer").value = "";
+			document.getElementById("location").innerHTML = "<strong>↑top</strong>";
+			//document.getElementById("inputInfix").innerHTML = "";
+			document.getElementById("inputMathFormPrompt").style.backgroundColor = "#fff";
+			document.getElementById("changeTo").style.backgroundColor = "#fff";
+			document.getElementById("modePrompt").style.backgroundColor = "#fff";
+			document.getElementById("speedPrompt").style.backgroundColor = "#fff";
+			document.getElementById("stepModePrompt").style.backgroundColor = "#fff";
+			
+			document.getElementById("selfTestResult").style.backgroundColor = "#fff";
+			document.getElementById("userInputAnswer").style.backgroundColor = "#fff";
+			document.getElementById("speedWord").innerHTML = "";
+			document.getElementById("inputInfix").disabled = false;
+			fixString = "";
+			stackStringStore = "";
+			outputStringStore = "";
+			infixArrayIndex = 0;
+			popContinue = 0;
+			first = 1;
+			allStepWordString = "";
+			step = 0;
+			currentStr = "";
+			operator = "";
+			firstFind = 1;
+			isAlreadyDecide = 0;
+			oldCurrent = "";
+			oldAllStep = "";
+		}
+
+		function clearAll(){
+			document.getElementById("fixCheck").innerHTML = "";
+			document.getElementById("inputInfix").value = ""; // text field clear data should use the value attribute.
+			document.getElementById("systemAnswer").value = "";
+			document.getElementById("userAnswer").value = "";
+			document.getElementById("userResult").innerHTML = "";
+			document.getElementById("speedWord").innerHTML = "";
+			mode = -1;
+			speed = -1;
+			fix = -1;// fix = 0 prefix,fix = 1 postfix
+			modeClear();
+			speedClear();
+			fixClear();
+			dataDelete();
+			/**
+			document.getElementById("inputMathFormPrompt").style.backgroundColor = "#fff";
+			document.getElementById("changeTo").style.backgroundColor = "#fff";
+			document.getElementById("modePrompt").style.backgroundColor = "#fff";
+			document.getElementById("speedPrompt").style.backgroundColor = "#fff";
+			document.getElementById("stepModePrompt").style.backgroundColor = "#fff";
+			document.getElementById("runAllPrompt").style.backgroundColor = "#fff";
+			document.getElementById("selfTestResult").style.backgroundColor = "#fff";
+			document.getElementById("speedDisplay").innerHTML = "";*/
+			process();
+
+		}
+
+		function process(){
+			document.getElementById("clearButton").disabled = false;
+			document.getElementById("inputMathFormPrompt").style.backgroundColor = "#fff";
+			document.getElementById("changeTo").style.backgroundColor = "#fff";
+			document.getElementById("modePrompt").style.backgroundColor = "#fff";
+			document.getElementById("speedPrompt").style.backgroundColor = "#fff";
+			document.getElementById("stepModePrompt").style.backgroundColor = "#fff";
+			
+			document.getElementById("userInputAnswer").style.backgroundColor = "#fff";
+			if(mode == -1){
+					document.getElementById("inputMathForm").innerHTML = "現在開始進行中序轉前序或後序測驗，請先選擇模式</strong>";
+					document.getElementById("stepButton").disabled = true;
+					
+					document.getElementById("modePrompt").style.backgroundColor = "#ff6";
+			}else if(mode == 1){
+					document.getElementById("inputInfix").disabled = true;
+					
+					document.getElementById("inputMathForm").innerHTML = "<strong>請你輸入自己出的中序題目</strong>";
+					// you can choose a run all
+					document.getElementById("stepButton").disabled = true;
+					document.getElementById("speedPrompt").style.backgroundColor = "#ff6";
+					
+			}else if(mode == 0){
+					document.getElementById("inputInfix").disabled = true;
+					document.getElementById("speedWord").innerHTML = "";
+					document.getElementById("inputMathForm").innerHTML = "<strong>現在已經出題完成，請根據題目輸入你的答案後按下Check Answer</strong>";
+					
+					document.getElementById("stepModePrompt").style.backgroundColor = "#ff6";
+					document.getElementById("speedWord").innerHTML = "";
+			}else{
+				
+			}
+			
+		}
+
+		function checkAnswer(){
+			clearInterval(myTimer);
+			modeClear();
+			speedClear();
+			document.getElementById("inputMathFormPrompt").style.backgroundColor = "#fff";
+			document.getElementById("changeTo").style.backgroundColor = "#fff";
+			document.getElementById("modePrompt").style.backgroundColor = "#fff";
+			document.getElementById("speedPrompt").style.backgroundColor = "#fff";
+			document.getElementById("stepModePrompt").style.backgroundColor = "#fff";
+			document.getElementById("runAllPrompt").style.backgroundColor = "#fff";
+			document.getElementById("userInputAnswer").style.backgroundColor = "#fff";
+			document.getElementById("selfTestResult").style.backgroundColor = "#ff6";
+			document.getElementById("speedWord").innerHTML = "";
+			document.getElementById("speedDisplay").innerHTML = "";
+
+
+			while(step != 5){
+				stepExe();
+			}
+
+			document.getElementById("systemAnswer").value = outputStringStore;
+
+			var userInput = document.getElementById("userAnswer").value;
+
+			if(outputStringStore == userInput){
+				document.getElementById("userResult").innerHTML = "答對";
+				document.getElementById("inputMathForm").innerHTML = "<strong>恭喜你答對，你可以在旁邊的轉換過程詳細確認，或是可以按下Clear All將程式重來一次</strong>";
+			}else{
+				document.getElementById("userResult").innerHTML = "答錯";
+				document.getElementById("inputMathForm").innerHTML = "<strong>可惜，你答錯了，你可能輸入答案時沒有各數字或運算子空一格，或是中間步驟可能出錯</strong>";
+			}
+			
+			var form = document.getElementById("mathForm");
+
+			for (var i = 0; i < form.mode.length; i++) {
+				form.mode[i].disabled = true;
+			}	
+
+		}
+
+		//1+(2*3/4-5-6)*7-8*9
+		//1+2*3/4-5
+		//1+(2*3/4-5-6)*7-8*9
+	</script>
+</html>
