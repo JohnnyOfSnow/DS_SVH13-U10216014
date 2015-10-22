@@ -225,9 +225,7 @@
 				}
 			}
 
-			if(mode == 1){ // user choose 
-			
-			}
+			 checkInfix();
 			process();
 		}// end function fixChoice()
 
@@ -269,7 +267,7 @@
 				document.getElementById("stepButton").disabled = true;
 				speedClear();
 			}else if(mode == 1){
-				
+				document.getElementById("inputInfix").disabled = false;
 				document.getElementById("stepButton").disabled = false;
 			}else{
 				
@@ -455,68 +453,69 @@
 							wrongInput = 1;
 					}
 				}
-			}else{
-				wrongInput = 1;
-			}
-			
-			if(parenthesisCount == 0){
-				if(wrongInput){
-							
+				if(parenthesisCount == 0){
+					if(wrongInput){
+								
+					}else{
+						wrongInput = 0;
+					}
 				}else{
-					wrongInput = 0;
+					wrongInput = 1;
 				}
-			}else{
-				wrongInput = 1;
-			}
-			
-			switch(infixCheckArray[infixCheckArray.length - 1]){
-				case "0":
-				case "1":
-				case "2":
-				case "3":
-				case "4":
-				case "5":
-				case "6":
-				case "7":
-				case "8":
-				case "9":
-				case ")":
-					if(wrongInput){
-							
-					}else{
-						wrongInput = 0;
-					}
-				break;
-				default:
+				
+				switch(infixCheckArray[infixCheckArray.length - 1]){
+					case "0":
+					case "1":
+					case "2":
+					case "3":
+					case "4":
+					case "5":
+					case "6":
+					case "7":
+					case "8":
+					case "9":
+					case ")":
+						if(wrongInput){
+								
+						}else{
+							wrongInput = 0;
+						}
+					break;
+					default:
+						wrongInput = 1;
+				}
+				
+				switch(infixCheckArray[0]){
+					case "0":
+					case "1":
+					case "2":
+					case "3":
+					case "4":
+					case "5":
+					case "6":
+					case "7":
+					case "8":
+					case "9":
+					case "(":
+						if(wrongInput){
+								
+						}else{
+							wrongInput = 0;
+						}
+					break;
+					default:
+						wrongInput = 1;
+				}
+				}else{
 					wrongInput = 1;
 			}
 			
-			switch(infixCheckArray[0]){
-				case "0":
-				case "1":
-				case "2":
-				case "3":
-				case "4":
-				case "5":
-				case "6":
-				case "7":
-				case "8":
-				case "9":
-				case "(":
-					if(wrongInput){
-							
-					}else{
-						wrongInput = 0;
-					}
-				break;
-				default:
-					wrongInput = 1;
-			}
+			
 			
 			if(wrongInput){
 				document.getElementById("fixCheck").innerHTML = "中序輸入錯誤";
-				modeClear();
-				speedClear();
+				//modeClear();
+				//speedClear();
 				fixClear();
 				dataDelete();
 				
@@ -1218,15 +1217,26 @@
 			if(mode == -1){
 					document.getElementById("inputMathForm").innerHTML = "現在開始進行中序轉前序或後序測驗，請先選擇模式</strong>";
 					document.getElementById("stepButton").disabled = true;
-					
+					document.getElementById("inputInfix").disabled = true;
 					document.getElementById("modePrompt").style.backgroundColor = "#ff6";
 			}else if(mode == 1){
-					document.getElementById("inputInfix").disabled = true;
+					//document.getElementById("inputInfix").disabled = true;
 					
-					document.getElementById("inputMathForm").innerHTML = "<strong>請你輸入自己出的中序題目</strong>";
+					document.getElementById("inputMathForm").innerHTML = "<strong>請你輸入自己出的中序題目(需輸入中序式以及按按鈕選擇前序還是後序)</strong>";
+					
 					// you can choose a run all
+					document.getElementById("inputMathFormPrompt").style.backgroundColor = "#ff6";
 					document.getElementById("stepButton").disabled = true;
-					document.getElementById("speedPrompt").style.backgroundColor = "#ff6";
+					//document.getElementById("speedPrompt").style.backgroundColor = "#fff";
+					var form = document.getElementById("mathForm");
+					var result = document.getElementById("fixWord");
+				
+
+					result.innerHTML = "";
+
+					for (var i = 0; i < form.fix.length; i++) {
+						form.fix[i].disabled = false;
+					}	
 					
 			}else if(mode == 0){
 					document.getElementById("inputInfix").disabled = true;
