@@ -62,52 +62,34 @@
 					
 					<table>
 						<tr>
-							<td><p id = "speedPrompt">Speed：</p></td>
-							<td>
-								<input type="radio" name="speed" value="快" onClick = "speedChoice();">快
-							</td>
-							<td>
-								<input type="radio" name="speed" value="中" onClick = "speedChoice();">中
-							</td>
-							<td>
-								<input type="radio" name="speed" value="慢" onClick = "speedChoice();">慢
-							</td>
-							<td>
-								<p id = "speedWord"></p>
-							</td>
-						</tr>	
-					</table>
-
-					<table>
-						<tr>
-							<td><p id = "stepModePrompt">Step mode請按這；</p></td>
-							<td><input type = "button" style=" width:100px;height:30px;font-size:15px;border:2px green solid " value = "Next" onClick = "stepExe();" id = "stepButton" disabled="true"></td>
-						</tr>
-					</table>
-
-					
-
-					<table>
-						<tr>
-							<td><p id = "userInputAnswer">你可以在這裡輸入你的答案：</p></td>
+							<td><p id = "userInputAnswer">在這裡輸入你的答案：</p></td>
 							<td><input type=text value="" id=userAnswer size="30" ></td>
 						</tr>
 					</table>
-
+					
 					<table>
 						<tr>
 							<td><p id = "ststemPrompt">系統處理結果：</p></td>
 							<td><input type=text value="" id=systemAnswer size="30" readonly="readonly"></td>
 						</tr>
 					</table>
-
+					
 					<table>
 						<tr>
 							<td><p id = "selfTestResult">Self-test比對結果：</p></td>
 							<td><p id = "userResult"></p></td>
 						</tr>
 					</table>
+					
 
+					<table>
+						<tr>
+							<td><p id = "stepModePrompt">逐步解答按這裡</p></td>
+							<td><input type = "button" style=" width:100px;height:30px;font-size:15px;border:2px green solid " value = "Next" onClick = "stepExe();" id = "stepButton" disabled="true"></td>
+						</tr>
+					</table>
+
+										
 					<!--
 						Button design reference:
 						http://csscodefile.blogspot.tw/2015/03/html-button.html
@@ -199,12 +181,12 @@
 		var oldCurrent = "";
 		var oldAllStep = "";
 		var myTimer;
-		var lowSpeed = 3000;
-		var medSpeed = 2000;
-		var highSpeed = 1000;
+		//var lowSpeed = 3000;
+		//var medSpeed = 2000;
+		//var highSpeed = 1000;
 		const EMPTY = 0;
-		const OPERAND = 1;
-		const OPERATOR = 2;
+		const OPERAND = 1; // 0~9
+		const OPERATOR = 2; // + - * /
 		const OpenParenthesis = 3;  // (
 		const ClosenParenthesis = 4;  // )
 
@@ -251,7 +233,7 @@
 		function modeChoice(){
 			clearInterval(myTimer);
 			dataDelete();
-			speedClear();
+			
 			var form = document.getElementById("mathForm");
 			var result = document.getElementById("modeWord");
 		
@@ -265,7 +247,6 @@
 			if(mode == 0){
 				
 				document.getElementById("stepButton").disabled = true;
-				speedClear();
 			}else if(mode == 1){
 				document.getElementById("inputInfix").disabled = false;
 				document.getElementById("stepButton").disabled = false;
@@ -274,7 +255,7 @@
 				document.getElementById("stepButton").disabled = true;
 				document.getElementById("runAllButton").disabled = true;
 			}
-			document.getElementById("speedWord").innerHTML = "";
+			
 			process();
 		}// end function modeChoice()
 
@@ -291,39 +272,10 @@
 			process();
 		}// end function modeClear()
 
-		function speedChoice(){
-			clearInterval(myTimer);
-			var form = document.getElementById("mathForm");
-			var result = document.getElementById("speedWord");
 		
-			for (var i = 0; i < form.speed.length; i++) {
-				if ( form.speed[i].checked ) {
-					result.innerHTML = "<strong>" + "選擇 " + form.speed[i].value + "速</strong>";
-					speed = i;			
-					break;
-				}
-			}
-			process();
-		}// end function modeChoice()
 
-		function speedClear(){
-			clearInterval(myTimer);
-			var form = document.getElementById("mathForm");
-			var result = document.getElementById("speedWord");
-		
-			for (var i = 0; i < form.speed.length; i++) {
-				form.speed[i].checked = false;
-				form.speed[i].disabled = true;
-			}
-			result.innerHTML = "";
-			speed = -1;
-			document.getElementById("speedWord").innerHTML = "";
-			
-			process();
-		}// end function modeClear()
-		
-		
-		
+	
+	
 		function judgeInfix(currentCha, nextCha){
 			switch(currentCha){
 				case EMPTY: // " "
@@ -452,8 +404,9 @@
 						default:
 							wrongInput = 1;
 					}
-				}
-				if(parenthesisCount == 0){
+				}// check user input infix every character if 0~9 or + - * /  
+				
+				if(parenthesisCount == 0){ // if user imput ) ,and that is not a correct infix.
 					if(wrongInput){
 								
 					}else{
@@ -462,53 +415,11 @@
 				}else{
 					wrongInput = 1;
 				}
+					
+			}else{// blank infix
+				wrongInput = 1;
 				
-				switch(infixCheckArray[infixCheckArray.length - 1]){
-					case "0":
-					case "1":
-					case "2":
-					case "3":
-					case "4":
-					case "5":
-					case "6":
-					case "7":
-					case "8":
-					case "9":
-					case ")":
-						if(wrongInput){
-								
-						}else{
-							wrongInput = 0;
-						}
-					break;
-					default:
-						wrongInput = 1;
-				}
-				
-				switch(infixCheckArray[0]){
-					case "0":
-					case "1":
-					case "2":
-					case "3":
-					case "4":
-					case "5":
-					case "6":
-					case "7":
-					case "8":
-					case "9":
-					case "(":
-						if(wrongInput){
-								
-						}else{
-							wrongInput = 0;
-						}
-					break;
-					default:
-						wrongInput = 1;
-				}
-				}else{
-					wrongInput = 1;
-			}
+			}// end blank infix check
 			
 			
 			
@@ -1155,12 +1066,10 @@
 			document.getElementById("inputMathFormPrompt").style.backgroundColor = "#fff";
 			document.getElementById("changeTo").style.backgroundColor = "#fff";
 			document.getElementById("modePrompt").style.backgroundColor = "#fff";
-			document.getElementById("speedPrompt").style.backgroundColor = "#fff";
 			document.getElementById("stepModePrompt").style.backgroundColor = "#fff";
 			
 			document.getElementById("selfTestResult").style.backgroundColor = "#fff";
 			document.getElementById("userInputAnswer").style.backgroundColor = "#fff";
-			document.getElementById("speedWord").innerHTML = "";
 			document.getElementById("inputInfix").disabled = false;
 			fixString = "";
 			stackStringStore = "";
@@ -1184,12 +1093,10 @@
 			document.getElementById("systemAnswer").value = "";
 			document.getElementById("userAnswer").value = "";
 			document.getElementById("userResult").innerHTML = "";
-			document.getElementById("speedWord").innerHTML = "";
 			mode = -1;
 			speed = -1;
 			fix = -1;// fix = 0 prefix,fix = 1 postfix
 			modeClear();
-			speedClear();
 			fixClear();
 			dataDelete();
 			/**
@@ -1210,7 +1117,6 @@
 			document.getElementById("inputMathFormPrompt").style.backgroundColor = "#fff";
 			document.getElementById("changeTo").style.backgroundColor = "#fff";
 			document.getElementById("modePrompt").style.backgroundColor = "#fff";
-			document.getElementById("speedPrompt").style.backgroundColor = "#fff";
 			document.getElementById("stepModePrompt").style.backgroundColor = "#fff";
 			
 			document.getElementById("userInputAnswer").style.backgroundColor = "#fff";
@@ -1240,11 +1146,11 @@
 					
 			}else if(mode == 0){
 					document.getElementById("inputInfix").disabled = true;
-					document.getElementById("speedWord").innerHTML = "";
+					
 					document.getElementById("inputMathForm").innerHTML = "<strong>現在已經出題完成，請根據題目輸入你的答案後按下Check Answer</strong>";
 					
 					document.getElementById("stepModePrompt").style.backgroundColor = "#ff6";
-					document.getElementById("speedWord").innerHTML = "";
+					
 			}else{
 				
 			}
@@ -1252,9 +1158,7 @@
 		}
 
 		function checkAnswer(){
-			clearInterval(myTimer);
 			modeClear();
-			speedClear();
 			document.getElementById("inputMathFormPrompt").style.backgroundColor = "#fff";
 			document.getElementById("changeTo").style.backgroundColor = "#fff";
 			document.getElementById("modePrompt").style.backgroundColor = "#fff";
@@ -1263,7 +1167,7 @@
 			document.getElementById("runAllPrompt").style.backgroundColor = "#fff";
 			document.getElementById("userInputAnswer").style.backgroundColor = "#fff";
 			document.getElementById("selfTestResult").style.backgroundColor = "#ff6";
-			document.getElementById("speedWord").innerHTML = "";
+			
 			document.getElementById("speedDisplay").innerHTML = "";
 
 
@@ -1285,10 +1189,7 @@
 			
 			var form = document.getElementById("mathForm");
 
-			for (var i = 0; i < form.mode.length; i++) {
-				form.mode[i].disabled = true;
-			}	
-
+			
 		}
 
 		//1+(2*3/4-5-6)*7-8*9
