@@ -2,6 +2,9 @@
 full description for this
 
 # Introduction
-mathFormTransferSimulate.html: for firefox look
 
-mathFormTransferSimulate1.html: for google brower and mac safari look
+mathFormTransferTest.html
+![image](https://github.com/JohnnyOfSnow/DS_SVH13-U10216014/blob/JohnnyOfSnow-patch-1/prefix_postfixTest.jpg)
+
+For infix change to prefix or postfix.（SelfTest: Question from computer or myself）
+
