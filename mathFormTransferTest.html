@@ -1,6 +1,6 @@
 <!--
-						將CheckAnswer按鈕 內容寫完
-						StepNext()
+						將CheckAnswer按鈕 按下去只顯示答案 
+						答案的過程給解答過程的兩個按鈕
 -->
 
 
@@ -90,9 +90,12 @@
 
 					<table>
 						<tr>
-							<td><p id = "stepModePrompt">逐步解答按這裡</p></td>
+							<td><p id = "stepModePrompt">解答過程</p></td>
 							<td><input type = "button" style=" width:100px;height:30px;font-size:15px;border:2px green solid " value = "Next" onClick = "stepExe();" id = "stepButton" disabled="true"></td>
+							<td><input type = "button" style=" width:100px;height:30px;font-size:15px;border:2px green solid " value = "All" onClick = "stepALLExe();" id = "stepAllButton" disabled="true"></td>
 						</tr>
+						
+						
 					</table>
 
 										
@@ -250,12 +253,15 @@
 			if(mode == 0){
 				
 				document.getElementById("stepButton").disabled = true;
+				document.getElementById("stepAllButton").disabled = true;
 			}else if(mode == 1){
 				document.getElementById("inputInfix").disabled = false;
 				document.getElementById("stepButton").disabled = false;
+				document.getElementById("stepAllButton").disabled = false;
 			}else{
 				
 				document.getElementById("stepButton").disabled = true;
+				document.getElementById("stepAllButton").disabled = true;
 				document.getElementById("runAllButton").disabled = true;
 			}
 			
@@ -322,7 +328,7 @@
 			if(fixString.value != ""){
 				infixCheckArray = (fixString.value).split(""); // sperate the string user input
 				
-				if(infixArray.length == 1){
+				if(infixCheckArray.length == 1){
 					wrongInput = 1;//infix length = 1 is not correct.   ex: 3  
 				}
 				
@@ -1110,11 +1116,14 @@
 			if(mode == -1){
 					document.getElementById("inputMathForm").innerHTML = "現在開始進行中序轉前序或後序測驗，請先選擇模式</strong>";
 					document.getElementById("stepButton").disabled = true;
+					document.getElementById("stepAllButton").disabled = true;
 					document.getElementById("inputInfix").disabled = true;
+					document.getElementById("answerButton").disabled = true;
 					document.getElementById("modePrompt").style.backgroundColor = "#ff6";
 			}else if(mode == 1){
 				if(fix != -1){// decide infix chnge to prefix or postfix
 					document.getElementById("stepButton").disabled = false;
+					document.getElementById("stepAllButton").disabled = false;
 					document.getElementById("userInputAnswer").style.backgroundColor = "#ff6";
 					document.getElementById("answerButton").disabled = false;
 				}else{
@@ -1125,6 +1134,7 @@
 					document.getElementById("changeTo").style.backgroundColor = "#ff6";
 					document.getElementById("inputMathFormPrompt").style.backgroundColor = "#ff6";
 					document.getElementById("stepButton").disabled = true;
+					document.getElementById("stepAllButton").disabled = true;
 					//document.getElementById("speedPrompt").style.backgroundColor = "#fff";
 					var form = document.getElementById("mathForm");
 					var result = document.getElementById("fixWord");
@@ -1150,6 +1160,14 @@
 			
 		}
 
+		function stepALLExe(){
+			while(step != 5){
+				stepExe();
+			}
+			
+		}
+		
+		
 		
 		function checkAnswer(){
 			
@@ -1164,6 +1182,8 @@
 			while(step != 5){
 				stepExe();
 			}
+			
+			
 
 			document.getElementById("systemAnswer").value = outputStringStore;
 
