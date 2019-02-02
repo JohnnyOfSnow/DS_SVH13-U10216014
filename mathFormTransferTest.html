@@ -196,6 +196,7 @@
 		const OpenParenthesis = 3;  // (
 		const ClosenParenthesis = 4;  // )
 
+
 		function fixChoice(){		
 			//dataDelete();
 			var form = document.getElementById("mathForm");
@@ -672,7 +673,7 @@
 
 					}
 				}else{
-					currentStr = currentStr + "\n現在堆疊為空 " + infixArray[infixArrayIndex] + " 直接壓入堆疊";
+					currentStr = currentStr + "\n現在堆疊為空, " + infixArray[infixArrayIndex] + " 直接壓入堆疊";
 					doStackPush(infixArray[infixArrayIndex]);
 						infixArrayIndex++;
 						step = 1;
@@ -844,7 +845,8 @@
 
 
 		function stepExe(){
-			if(fix == 1){
+			if(fix == 1 && step != 5){ //postfix
+			
 				//var word = document.getElementById("allStepWordString");
 				if(step == 0){
 					currentStr = "";
@@ -854,7 +856,6 @@
 					allStepWordString = currentStr;
 					document.getElementById("currentStepTextArea").innerHTML = currentStr;
 					document.getElementById("allStepTextArea").innerHTML = allStepWordString;
-					fixPreHandle();
 					step++;
 				}else if(step == 1){
 					if(infixArrayIndex < infixArray.length){
@@ -892,14 +893,14 @@
 						
 					}
 				}else if(step == 2){
+					currentStr = "";
 					if(doStackPeek() == "empty"){
-						currentStr = "";
+						
 						currentStr = "\n中序式轉後序式結束";
 						document.getElementById("currentStepTextArea").innerHTML = currentStr;
 						document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + currentStr;
 						step = 5;
 					}else{
-						currentStr = "";
 						currentStr = "\nScan完畢，但堆疊還有運算子";
 						doStackPop();
 						document.getElementById("currentStepTextArea").innerHTML = currentStr;
@@ -918,7 +919,7 @@
 					document.getElementById("outputText").value = outputStringStore;
 					document.getElementById("stackText").value = stackStringStore;
 					var temp = allStepWordString;
-					document.getElementById("currentStepTextArea").innerHTML = oldCurrent + "\n" + currentStr;
+					document.getElementById("currentStepTextArea").innerHTML = "\n" + currentStr;
 					document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + currentStr;
 
 					if(isAlreadyDecide == 0){
@@ -942,8 +943,14 @@
 				}else{
 
 				}
-			}else if(fix == 0){
+				//if infix and stack empty not display the word.
+				infixStatus();
+				stackStatus();
+			
+			}else if(fix == 0 && step != 5){ //Prefix
+				
 				if(step == 0){
+				
 					currentStr = "";
 					currentStr = "開始進行中序轉前序，掃描方向為由右到左\n";
 					document.getElementById("outputText").value = outputStringStore;
@@ -952,7 +959,7 @@
 					document.getElementById("currentStepTextArea").innerHTML = currentStr;
 					document.getElementById("allStepTextArea").innerHTML = allStepWordString;
 					//infixArrayIndex = infixArray.length - 1;
-					fixPreHandle();
+					
 					step++;
 				}else if(step == 1){
 					if(infixArrayIndex >= 0){
@@ -1009,14 +1016,14 @@
 					}
 
 				}else if(step == 4){
-					oldCurrent = oldCurrent + currentStr;
+					//oldCurrent = oldCurrent + currentStr;
 					oldAllStep = allStepWordString;
 					currentStr = "";
 					decideWhatTimeCanPushInStackForPrefix();
 					document.getElementById("outputText").value = outputStringStore;
 					document.getElementById("stackText").value = stackStringStore;
 					var temp = allStepWordString;
-					document.getElementById("currentStepTextArea").innerHTML = oldCurrent + "\n" + currentStr;
+					document.getElementById("currentStepTextArea").innerHTML = "\n" + currentStr;
 					document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + currentStr;
 
 					if(isAlreadyDecide == 0){
@@ -1041,11 +1048,41 @@
 					// step 5
 					// End will enter this block.
 				}
+				infixStatus();
+				stackStatus();
 			}else{
 
 			}
 		}// end function stepExe()
 
+		
+		function infixStatus(){
+			currentStr = "";
+			//infixCurrentLocation = infixArrayIndex;
+			
+			if(fix){
+				for(var count = infixArrayIndex; count < infixArray.length; count++){
+					currentStr = currentStr + infixArray[count];
+				}
+			}else{
+				for(var count = 0; count <= infixArrayIndex; count++){
+					currentStr = currentStr + infixArray[count];
+				}
+			}
+			
+			// 2019/2/2 need add some statement for infix empty not display word.
+			
+			
+			allStepWordString = allStepWordString + "\n中序狀態:" + currentStr;
+			document.getElementById("allStepTextArea").innerHTML = allStepWordString;
+		}
+		
+		function stackStatus(){
+			
+			allStepWordString = allStepWordString + "\n堆疊狀態:" + document.getElementById("stackText").value;
+			document.getElementById("allStepTextArea").innerHTML = allStepWordString;
+		}
+		
 		
 		function dataDelete(){
 			
@@ -1056,15 +1093,20 @@
 			document.getElementById("userAnswer").value = "";
 			document.getElementById("location").innerHTML = "<strong>↑top</strong>";
 			document.getElementById("inputInfix").value = "";
+			
 			document.getElementById("changeTo").style.backgroundColor = "#fff";
 			document.getElementById("inputMathFormPrompt").style.backgroundColor = "#fff";
 			document.getElementById("changeTo").style.backgroundColor = "#fff";
 			document.getElementById("modePrompt").style.backgroundColor = "#fff";
 			document.getElementById("stepModePrompt").style.backgroundColor = "#fff";
-			
 			document.getElementById("selfTestResult").style.backgroundColor = "#fff";
 			document.getElementById("userInputAnswer").style.backgroundColor = "#fff";
 			document.getElementById("inputInfix").disabled = false;
+			
+			infixDataDelete();
+		}
+		
+		function infixDataDelete(){
 			fixString = "";
 			stackStringStore = "";
 			outputStringStore = "";
@@ -1126,6 +1168,7 @@
 					document.getElementById("stepAllButton").disabled = false;
 					document.getElementById("userInputAnswer").style.backgroundColor = "#ff6";
 					document.getElementById("answerButton").disabled = false;
+					fixPreHandle();
 				}else{
 					//document.getElementById("inputInfix").disabled = true;
 					
@@ -1165,6 +1208,9 @@
 				stepExe();
 			}
 			
+			rightOrWrong();
+			document.getElementById("stepButton").disabled = true;
+			document.getElementById("stepAllButton").disabled = true;
 		}
 		
 		
@@ -1178,13 +1224,15 @@
 			document.getElementById("userInputAnswer").style.backgroundColor = "#fff";
 			document.getElementById("selfTestResult").style.backgroundColor = "#ff6";
 				
-			
 			while(step != 5){
 				stepExe();
 			}
 			
+			rightOrWrong();	
 			
-
+		}
+		
+		function rightOrWrong(){
 			document.getElementById("systemAnswer").value = outputStringStore;
 
 			var userInput = document.getElementById("userAnswer").value;
@@ -1197,7 +1245,8 @@
 				document.getElementById("inputMathForm").innerHTML = "<strong>可惜，你答錯了，你可能輸入答案時沒有各數字或運算子空一格，或是中間步驟可能出錯</strong>";
 			}
 			
-			var form = document.getElementById("mathForm");
+			document.getElementById("answerButton").disabled = true;
+			//var form = document.getElementById("mathForm");
 		}
 
 		//1+(2*3/4-5-6)*7-8*9
