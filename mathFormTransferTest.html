@@ -854,8 +854,10 @@
 					document.getElementById("outputText").value = outputStringStore;
 					document.getElementById("stackText").value = stackStringStore;
 					allStepWordString = currentStr;
-					document.getElementById("currentStepTextArea").innerHTML = currentStr;
-					document.getElementById("allStepTextArea").innerHTML = allStepWordString;
+					
+					displayCurrentStep(currentStr);
+					displayAllStep(allStepWordString);
+					
 					step++;
 				}else if(step == 1){
 					if(infixArrayIndex < infixArray.length){
@@ -867,9 +869,12 @@
 						}	
 						
 						doPostfix();
-						document.getElementById("outputText").value = outputStringStore;
+						
+						displayOutput(outputStringStore);
+						displayAllStep(allStepWordString);
+						
 						document.getElementById("stackText").value = stackStringStore;
-						document.getElementById("allStepTextArea").innerHTML = allStepWordString;
+						
 						if(firstFind == 0){
 							step = 4;
 						}else{
@@ -883,10 +888,13 @@
 							currentStr = "";
 							currentStr = "\nScan完畢，但堆疊還有運算子";
 							doStackPop();
-							document.getElementById("currentStepTextArea").innerHTML = currentStr;
-							document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value;
+							
+							displayCurrentStep(currentStr);							
+							displayAllStep(allStepWordString + "\n" + document.getElementById("currentStepTextArea").value);
+							displayOutput(outputStringStore);
+							
 							allStepWordString = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value; 
-							document.getElementById("outputText").value = outputStringStore;
+					
 							document.getElementById("stackText").value = stackStringStore;
 							step = 2;
 						}
@@ -897,16 +905,24 @@
 					if(doStackPeek() == "empty"){
 						
 						currentStr = "\n中序式轉後序式結束";
-						document.getElementById("currentStepTextArea").innerHTML = currentStr;
-						document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + currentStr;
+						
+						displayCurrentStep(currentStr);					
+						displayAllStep(allStepWordString + "\n" + currentStr);
+						
 						step = 5;
 					}else{
 						currentStr = "\nScan完畢，但堆疊還有運算子";
 						doStackPop();
-						document.getElementById("currentStepTextArea").innerHTML = currentStr;
-						document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value;
+						
+						displayCurrentStep(currentStr);
+						displayAllStep(allStepWordString + "\n" + document.getElementById("currentStepTextArea").value);
+						displayOutput(outputStringStore);
+						
+						
 						allStepWordString = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value; 
-						document.getElementById("outputText").value = outputStringStore;
+						
+						
+						//document.getElementById("outputText").value = outputStringStore;
 						document.getElementById("stackText").value = stackStringStore;
 						step = 2;
 					}
@@ -916,12 +932,15 @@
 					oldAllStep = allStepWordString;
 					currentStr = "";
 					decideWhatTimeCanPushInStack();
-					document.getElementById("outputText").value = outputStringStore;
+					
+					displayOutput(outputStringStore);
+					
 					document.getElementById("stackText").value = stackStringStore;
 					var temp = allStepWordString;
-					document.getElementById("currentStepTextArea").innerHTML = "\n" + currentStr;
-					document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + currentStr;
-
+					
+					displayCurrentStep("\n" + currentStr);
+					displayAllStep(allStepWordString + "\n" + currentStr);
+					
 					if(isAlreadyDecide == 0){
 						allStepWordString = allStepWordString + currentStr;
 					}else{
@@ -937,8 +956,10 @@
 				}else if(step == 3){
 					currentStr = "";
 					currentStr = "\n中序式轉後序式結束";
-					document.getElementById("currentStepTextArea").innerHTML = currentStr;
-					document.getElementById("allStepTextArea").innerHTML = allStepWordString + currentStr;
+					
+					displayCurrentStep(currentStr);
+					displayAllStep(allStepWordString + currentStr);
+					
 					step = 5;
 				}else{
 
@@ -953,12 +974,15 @@
 				
 					currentStr = "";
 					currentStr = "開始進行中序轉前序，掃描方向為由右到左\n";
-					document.getElementById("outputText").value = outputStringStore;
+					
+					displayOutput(outputStringStore);
+					
 					document.getElementById("stackText").value = stackStringStore;
 					allStepWordString = currentStr;
-					document.getElementById("currentStepTextArea").innerHTML = currentStr;
-					document.getElementById("allStepTextArea").innerHTML = allStepWordString;
-					//infixArrayIndex = infixArray.length - 1;
+					
+					displayCurrentStep(currentStr);
+					
+					displayAllStep(allStepWordString);
 					
 					step++;
 				}else if(step == 1){
@@ -971,9 +995,13 @@
 						}	
 						
 						doPrefix();
-						document.getElementById("outputText").value = outputStringStore;
+						
+						displayOutput(outputStringStore);
+						
 						document.getElementById("stackText").value = stackStringStore;
-						document.getElementById("allStepTextArea").innerHTML = allStepWordString;
+						
+						displayAllStep(allStepWordString);
+						
 						if(firstFind == 0){
 							step = 4;
 						}else{
@@ -987,10 +1015,13 @@
 							currentStr = "";
 							currentStr = "\nScan完畢，但堆疊還有運算子";
 							doStackPop();
-							document.getElementById("currentStepTextArea").innerHTML = currentStr;
-							document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value;
+							
+							displayCurrentStep(currentStr);
+							displayAllStep(allStepWordString + "\n" + document.getElementById("currentStepTextArea").value)
+							displayOutput(outputStringStore);
+							
 							allStepWordString = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value; 
-							document.getElementById("outputText").value = outputStringStore;
+							
 							document.getElementById("stackText").value = stackStringStore;
 							step = 2;
 						}
@@ -1000,17 +1031,24 @@
 					if(doStackPeek() == "empty"){
 						currentStr = "";
 						currentStr = "\n中序式轉前序式結束";
-						document.getElementById("currentStepTextArea").innerHTML = currentStr;
-						document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + currentStr;
+						
+						displayCurrentStep(currentStr);
+						displayAllStep(allStepWordString + "\n" + currentStr)
+						
 						step = 5;
 					}else{
 						currentStr = "";
 						currentStr = "\nScan完畢，但堆疊還有運算子";
 						doStackPop();
-						document.getElementById("currentStepTextArea").innerHTML = currentStr;
-						document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value;
+						
+						displayCurrentStep(currentStr);
+						displayAllStep(allStepWordString + "\n" + document.getElementById("currentStepTextArea").value);
+						displayOutput(outputStringStore);
+						
 						allStepWordString = allStepWordString + "\n" + document.getElementById("currentStepTextArea").value; 
-						document.getElementById("outputText").value = outputStringStore;
+						
+						
+						
 						document.getElementById("stackText").value = stackStringStore;
 						step = 2;
 					}
@@ -1020,12 +1058,15 @@
 					oldAllStep = allStepWordString;
 					currentStr = "";
 					decideWhatTimeCanPushInStackForPrefix();
-					document.getElementById("outputText").value = outputStringStore;
+					
+					
 					document.getElementById("stackText").value = stackStringStore;
 					var temp = allStepWordString;
-					document.getElementById("currentStepTextArea").innerHTML = "\n" + currentStr;
-					document.getElementById("allStepTextArea").innerHTML = allStepWordString + "\n" + currentStr;
-
+					
+					displayCurrentStep("\n" + currentStr);
+					displayAllStep(allStepWordString + "\n" + currentStr);
+					displayOutput(outputStringStore);
+					
 					if(isAlreadyDecide == 0){
 						allStepWordString = allStepWordString + currentStr;
 					}else{
@@ -1041,8 +1082,11 @@
 				}else if(step == 3){
 					currentStr = "";
 					currentStr = "\n中序式轉前序式結束";
-					document.getElementById("currentStepTextArea").innerHTML = currentStr;
-					document.getElementById("allStepTextArea").innerHTML = allStepWordString + currentStr;
+					
+					displayCurrentStep(currentStr);
+					
+					displayAllStep(allStepWordString + currentStr);
+					
 					step = 5;
 				}else{
 					// step 5
@@ -1072,15 +1116,31 @@
 			
 			// 2019/2/2 need add some statement for infix empty not display word.
 			
+			if(currentStr != ""){
+				allStepWordString = allStepWordString + "\n中序狀態:" + currentStr;
+				document.getElementById("allStepTextArea").innerHTML = allStepWordString;
+			}
 			
-			allStepWordString = allStepWordString + "\n中序狀態:" + currentStr;
-			document.getElementById("allStepTextArea").innerHTML = allStepWordString;
+			
+			
 		}
 		
 		function stackStatus(){
 			
 			allStepWordString = allStepWordString + "\n堆疊狀態:" + document.getElementById("stackText").value;
 			document.getElementById("allStepTextArea").innerHTML = allStepWordString;
+		}
+		
+		function displayOutput(outputString){
+			document.getElementById("outputText").value = outputString;
+		}
+		
+		function displayCurrentStep(currentStep){
+			document.getElementById("currentStepTextArea").innerHTML = currentStep;
+		}
+		
+		function displayAllStep(allStep){
+			document.getElementById("allStepTextArea").innerHTML = allStep;
 		}
 		
 		
